@@ -60,7 +60,7 @@ const Landing = () => {
               <GraduationCap className="w-6 h-6 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-foreground">CampusConnect</h1>
+              <h1 className="text-xl font-bold text-foreground">Internlink</h1>
               <p className="text-sm text-muted-foreground">Placement Management Platform</p>
             </div>
           </div>
@@ -227,10 +227,10 @@ const Landing = () => {
               <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
                 <GraduationCap className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="text-lg font-semibold">CampusConnect</span>
+              <span className="text-lg font-semibold">Internlink</span>
             </div>
             <p className="text-muted-foreground text-center md:text-right">
-              © 2024 CampusConnect. Empowering careers through technology.
+              © 2024 Internlink. Empowering careers through technology.
             </p>
           </div>
         </div>

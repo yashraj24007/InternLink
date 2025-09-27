@@ -1,33 +1,31 @@
-# Welcome to your Lovable project
+# Internlink
 
-## Project info
+A comprehensive multi-dashboard web application for campus management, connecting students, mentors, recruiters, and administrators.
 
-**URL**: https://lovable.dev/projects/778e68a9-ac34-4930-970b-e302fc736bb7
+## Project Overview
 
-## How can I edit this code?
+Internlink provides role-based dashboards for different stakeholders in the campus ecosystem:
+- **Student Dashboard**: Academic progress, placement opportunities, mentorship
+- **Mentor Dashboard**: Mentee management, guidance tools
+- **Recruiter Dashboard**: Talent acquisition, job postings
+- **Admin Dashboard**: System management, user oversight
 
-There are several ways of editing your application.
+## How to Run This Project
 
-**Use Lovable**
+**Using your preferred IDE**
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/778e68a9-ac34-4930-970b-e302fc736bb7) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Clone this repository and run it locally:
 
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
 Follow these steps:
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Step 1: Clone the repository
+git clone https://github.com/yashraj24007/InternLink.git
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Step 2: Navigate to the project directory
+cd InternLink
 
 # Step 3: Install the necessary dependencies.
 npm i
@@ -50,24 +48,32 @@ npm run dev
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
 
-## What technologies are used for this project?
+## Technologies Used
 
 This project is built with:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- **Vite** - Fast build tool and dev server
+- **TypeScript** - Type-safe JavaScript
+- **React** - UI framework
+- **shadcn-ui** - Modern UI components
+- **Tailwind CSS** - Utility-first CSS framework
 
-## How can I deploy this project?
+## Features
 
-Simply open [Lovable](https://lovable.dev/projects/778e68a9-ac34-4930-970b-e302fc736bb7) and click on Share -> Publish.
+- Multi-role dashboard system
+- Responsive design
+- Modern UI components
+- Type-safe development
+- Fast development server with HMR
 
-## Can I connect a custom domain to my Lovable project?
+## Contributing
 
-Yes, you can!
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## License
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+This project is open source and available under the [MIT License](LICENSE).
