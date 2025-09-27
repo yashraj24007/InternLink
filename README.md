@@ -1,10 +1,10 @@
-# Internlink
+# InternLink
 
 A comprehensive multi-dashboard web application for campus management, connecting students, mentors, recruiters, and administrators.
 
 ## Project Overview
 
-Internlink provides role-based dashboards for different stakeholders in the campus ecosystem:
+InternLink provides role-based dashboards for different stakeholders in the campus ecosystem:
 - **Student Dashboard**: Academic progress, placement opportunities, mentorship
 - **Mentor Dashboard**: Mentee management, guidance tools
 - **Recruiter Dashboard**: Talent acquisition, job postings

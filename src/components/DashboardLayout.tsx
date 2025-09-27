@@ -2,6 +2,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Button } from "@/components/ui/button";
 import { Bell, User, LogOut } from "lucide-react";
+import { ThemeSwitch } from "@/components/ui/theme-switch";
 import { ReactNode } from "react";
 
 interface DashboardLayoutProps {
@@ -30,6 +31,8 @@ export function DashboardLayout({ children, role, title }: DashboardLayoutProps)
             </div>
             
             <div className="flex items-center gap-3">
+              <ThemeSwitch />
+              
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="w-5 h-5" />
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-destructive rounded-full text-xs flex items-center justify-center text-destructive-foreground">

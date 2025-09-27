@@ -140,7 +140,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
             </div>
             {!collapsed && (
               <div>
-                <h2 className="text-sidebar-foreground font-semibold">Internlink</h2>
+                <h2 className="text-sidebar-foreground font-semibold">InternLink</h2>
                 <p className="text-sidebar-foreground/70 text-xs capitalize">{role} Portal</p>
               </div>
             )}
