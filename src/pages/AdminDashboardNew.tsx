@@ -55,9 +55,9 @@ const AdminDashboard = () => {
 
   const userStats = [
     { role: "Students", count: 2847, active: 2645, growth: "+12%" },
-    { role: "Faculty", count: 156, active: 142, growth: "+5%" },
-    { role: "Staff", count: 89, active: 78, growth: "+8%" },
-    { role: "Administrators", count: 32, active: 28, growth: "+2%" },
+    { role: "Mentors", count: 156, active: 142, growth: "+5%" },
+    { role: "Recruiters", count: 89, active: 78, growth: "+8%" },
+    { role: "Placement Cell", count: 32, active: 28, growth: "+2%" },
   ];
 
   const systemLogs = [
@@ -82,9 +82,9 @@ const AdminDashboard = () => {
 
   const recentUsers = [
     { id: 1, name: "John Doe", email: "john.doe@university.edu", role: "student", status: "active", lastLogin: "5 min ago" },
-    { id: 2, name: "Dr. Smith", email: "smith@university.edu", role: "faculty", status: "active", lastLogin: "1 hour ago" },
-    { id: 3, name: "Jane Wilson", email: "jane.wilson@university.edu", role: "staff", status: "pending", lastLogin: "Never" },
-    { id: 4, name: "System Admin", email: "admin@university.edu", role: "administrator", status: "active", lastLogin: "2 hours ago" },
+    { id: 2, name: "Dr. Smith", email: "smith@university.edu", role: "mentor", status: "active", lastLogin: "1 hour ago" },
+    { id: 3, name: "Jane Wilson", email: "jane@techcorp.com", role: "recruiter", status: "pending", lastLogin: "Never" },
+    { id: 4, name: "Admin User", email: "admin@university.edu", role: "placement_cell", status: "active", lastLogin: "2 hours ago" },
   ];
 
   return (
@@ -94,7 +94,7 @@ const AdminDashboard = () => {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-slate-900 dark:text-white">System Administration</h1>
-            <p className="text-slate-600 dark:text-slate-400 mt-1">Monitor platform health, manage users, and oversee system operations</p>
+            <p className="text-slate-600 dark:text-slate-400 mt-1">Manage users, system health, and security</p>
           </div>
           <div className="flex items-center gap-4">
             <Button asChild variant="ghost" size="icon">

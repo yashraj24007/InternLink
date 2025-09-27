@@ -61,12 +61,12 @@ const getMenusByRole = (role: string): MenuGroup[] => {
         {
           label: "Dashboard",
           items: [
-            { title: "Overview", url: "/admin-dashboard", icon: Home },
-            { title: "Analytics", url: "/admin-dashboard/analytics", icon: BarChart3 },
-            { title: "Students", url: "/admin-dashboard/students", icon: GraduationCap },
-            { title: "Opportunities", url: "/admin-dashboard/opportunities", icon: Briefcase },
-            { title: "Recruiters", url: "/admin-dashboard/recruiters", icon: Building2 },
-            { title: "Reports", url: "/admin-dashboard/reports", icon: TrendingUp },
+            { title: "Overview", url: "/admin", icon: Home },
+            { title: "Analytics", url: "/admin/analytics", icon: BarChart3 },
+            { title: "Students", url: "/admin/students", icon: GraduationCap },
+            { title: "Opportunities", url: "/admin/opportunities", icon: Briefcase },
+            { title: "Recruiters", url: "/admin/recruiters", icon: Building2 },
+            { title: "Reports", url: "/admin/reports", icon: TrendingUp },
           ]
         }
       ];
