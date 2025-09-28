@@ -412,6 +412,54 @@ const AdminDashboard = () => {
           </div>
           
           <div className="flex items-center gap-4">
+            {/* Notifications */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="relative">
+                  <Bell className="w-4 h-4" />
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-red-500">
+                    3
+                  </Badge>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-80">
+                <DropdownMenuLabel>System Alerts & Notifications</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="flex items-start space-x-3 p-3">
+                  <AlertTriangle className="h-4 w-4 mt-0.5 text-orange-500" />
+                  <div className="flex-1">
+                    <p className="font-medium text-sm">System Anomaly Detected</p>
+                    <p className="text-xs text-muted-foreground">Server load is above normal - 85%</p>
+                    <p className="text-xs text-muted-foreground">2 minutes ago</p>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="flex items-start space-x-3 p-3">
+                  <Clock className="h-4 w-4 mt-0.5 text-blue-500" />
+                  <div className="flex-1">
+                    <p className="font-medium text-sm">Approval Deadline Approaching</p>
+                    <p className="text-xs text-muted-foreground">23 applications require approval by tomorrow</p>
+                    <p className="text-xs text-muted-foreground">1 hour ago</p>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="flex items-start space-x-3 p-3">
+                  <Upload className="h-4 w-4 mt-0.5 text-red-500" />
+                  <div className="flex-1">
+                    <p className="font-medium text-sm">Failed Upload Detected</p>
+                    <p className="text-xs text-muted-foreground">Resume upload failed for 3 users</p>
+                    <p className="text-xs text-muted-foreground">3 hours ago</p>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="text-center p-2">
+                  <Button variant="ghost" size="sm" className="w-full">
+                    View All Notifications
+                  </Button>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             {/* Homepage Button */}
             <Button asChild variant="ghost" size="icon" className="hover:bg-slate-100 dark:hover:bg-slate-700">
               <Link to="/">
@@ -590,22 +638,38 @@ const AdminDashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2" onClick={() => setActiveTab('users')}>
                     <UserPlus className="h-6 w-6" />
-                    <span className="text-sm">Add/Remove Users</span>
+                    <span className="text-xs">Add/Remove Users</span>
                   </Button>
                   <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2" onClick={() => setActiveTab('users')}>
                     <Shield className="h-6 w-6" />
-                    <span className="text-sm">Manage Roles</span>
+                    <span className="text-xs">Manage Roles</span>
                   </Button>
                   <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2" onClick={() => setActiveTab('security')}>
                     <FileText className="h-6 w-6" />
-                    <span className="text-sm">View Logs</span>
+                    <span className="text-xs">Audit Logs</span>
                   </Button>
                   <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2" onClick={() => setActiveTab('system')}>
                     <Settings className="h-6 w-6" />
-                    <span className="text-sm">System Settings</span>
+                    <span className="text-xs">System Settings</span>
+                  </Button>
+                  <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2" onClick={() => setActiveTab('content')}>
+                    <Eye className="h-6 w-6" />
+                    <span className="text-xs">Content Moderation</span>
+                  </Button>
+                  <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2" onClick={() => setActiveTab('analytics')}>
+                    <BarChart3 className="h-6 w-6" />
+                    <span className="text-xs">Analytics</span>
+                  </Button>
+                  <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2" onClick={() => setActiveTab('system')}>
+                    <Database className="h-6 w-6" />
+                    <span className="text-xs">Backup & Restore</span>
+                  </Button>
+                  <Button variant="outline" className="h-20 flex flex-col items-center justify-center space-y-2" onClick={() => setActiveTab('resources')}>
+                    <Monitor className="h-6 w-6" />
+                    <span className="text-xs">System Health</span>
                   </Button>
                 </div>
               </CardContent>
@@ -787,6 +851,16 @@ const AdminDashboard = () => {
           <TabsContent value="content" className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-2xl font-bold">System Oversight</h3>
+              <div className="flex space-x-2">
+                <Button variant="outline" size="sm">
+                  <Filter className="h-4 w-4 mr-2" />
+                  Filter Content
+                </Button>
+                <Button variant="outline" size="sm">
+                  <Download className="h-4 w-4 mr-2" />
+                  Export Report
+                </Button>
+              </div>
             </div>
 
             <div className="grid lg:grid-cols-2 gap-6">
@@ -1179,6 +1253,104 @@ const AdminDashboard = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Role Analytics - Bonus Feature */}
+            <Card className="border-none shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Users className="h-5 w-5" />
+                  <span>Role Analytics</span>
+                </CardTitle>
+                <CardDescription>Track user engagement and role-based activity</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="p-4 border rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium">Most Active Mentors</span>
+                      <Badge variant="secondary">Top 5</Badge>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Dr. Smith</span>
+                        <span className="text-green-600">98% active</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>Prof. Johnson</span>
+                        <span className="text-green-600">94% active</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>Dr. Williams</span>
+                        <span className="text-blue-600">87% active</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 border rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium">Recruiter Engagement</span>
+                      <Badge variant="secondary">This Month</Badge>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>TechCorp Inc.</span>
+                        <span className="text-green-600">45 postings</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>StartupXYZ</span>
+                        <span className="text-blue-600">23 postings</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>MegaCorp Ltd.</span>
+                        <span className="text-orange-600">12 postings</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 border rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium">Student Engagement</span>
+                      <Badge variant="secondary">Internships</Badge>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>High Engagement</span>
+                        <span className="text-green-600">67%</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>Medium Engagement</span>
+                        <span className="text-blue-600">25%</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>Low Engagement</span>
+                        <span className="text-orange-600">8%</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 border rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium">Platform Usage</span>
+                      <Badge variant="secondary">Weekly</Badge>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Daily Active Users</span>
+                        <span className="text-green-600">1,234</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>Weekly Retention</span>
+                        <span className="text-blue-600">78%</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>Feature Usage</span>
+                        <span className="text-purple-600">85%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* System Configuration Tab */}
@@ -1412,6 +1584,89 @@ const AdminDashboard = () => {
                     <p className="text-sm text-muted-foreground mb-2">Long-term partners</p>
                     <Button variant="outline" size="sm" className="w-full">
                       Track Companies
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Custom Dashboard Widgets */}
+            <Card className="border-none shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Palette className="h-5 w-5" />
+                  <span>Custom Dashboard Widgets</span>
+                </CardTitle>
+                <CardDescription>Customize your admin dashboard layout and KPIs</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h4 className="font-medium">Available Widgets</h4>
+                    <Button size="sm">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Widget
+                    </Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="p-3 border rounded-lg flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <BarChart3 className="h-4 w-4 text-blue-500" />
+                        <span className="text-sm">Placement Rate Chart</span>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                    
+                    <div className="p-3 border rounded-lg flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Users className="h-4 w-4 text-green-500" />
+                        <span className="text-sm">User Growth</span>
+                      </div>
+                      <Switch />
+                    </div>
+                    
+                    <div className="p-3 border rounded-lg flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <TrendingUp className="h-4 w-4 text-purple-500" />
+                        <span className="text-sm">Success Metrics</span>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                    
+                    <div className="p-3 border rounded-lg flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Activity className="h-4 w-4 text-orange-500" />
+                        <span className="text-sm">System Health</span>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                    
+                    <div className="p-3 border rounded-lg flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Clock className="h-4 w-4 text-red-500" />
+                        <span className="text-sm">Pending Approvals</span>
+                      </div>
+                      <Switch />
+                    </div>
+                    
+                    <div className="p-3 border rounded-lg flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <PieChart className="h-4 w-4 text-indigo-500" />
+                        <span className="text-sm">Department Stats</span>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                  </div>
+                  
+                  <div className="flex space-x-2">
+                    <Button variant="outline" className="flex-1">
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Reset Layout
+                    </Button>
+                    <Button className="flex-1">
+                      <Save className="h-4 w-4 mr-2" />
+                      Save Layout
                     </Button>
                   </div>
                 </div>
