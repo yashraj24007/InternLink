@@ -129,8 +129,8 @@ const Landing = () => {
   };
 
   const handleDemoClick = () => {
-    toast.info("Demo coming soon!", {
-      description: "We're preparing an interactive demo for you"
+    toast.info("Quick Demo", {
+      description: "Use demo accounts from login page to explore all features!"
     });
   };
 
@@ -295,11 +295,8 @@ const Landing = () => {
                 </Button>
               </div>
             ) : (
-              // Show navigation and auth buttons for guests
+              // Show only Login button for guests
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" asChild className="transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg">
-                  <Link to="/signup">Sign Up</Link>
-                </Button>
                 <Button variant="default" size="sm" asChild className="transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg">
                   <Link to="/login">Login</Link>
                 </Button>

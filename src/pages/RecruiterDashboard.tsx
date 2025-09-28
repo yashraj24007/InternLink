@@ -84,7 +84,8 @@ import {
   Copy,
   ExternalLink,
   Share2,
-  AlertTriangle
+  AlertTriangle,
+  MoreHorizontal
 } from 'lucide-react';
 
 const RecruiterDashboard = () => {
@@ -104,6 +105,10 @@ const RecruiterDashboard = () => {
   const [bulkActionMode, setBulkActionMode] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [currentJobId, setCurrentJobId] = useState<number | null>(null);
+  const [showCertificateVerification, setShowCertificateVerification] = useState(false);
+  const [showBrandingCenter, setShowBrandingCenter] = useState(false);
+  const [autoPostingEnabled, setAutoPostingEnabled] = useState(false);
+  const [feedbackToCandidate, setFeedbackToCandidate] = useState<string>('');
 
   // Profile Data
   const [profileData, setProfileData] = useState({
@@ -322,7 +327,7 @@ const RecruiterDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 pt-12">
       <div className="container mx-auto p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -381,11 +386,13 @@ const RecruiterDashboard = () => {
 
         {/* Main Dashboard Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6">
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 xl:grid-cols-8">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="candidates">Candidates</TabsTrigger>
             <TabsTrigger value="jobs">Job Postings</TabsTrigger>
             <TabsTrigger value="interviews">Interviews</TabsTrigger>
+            <TabsTrigger value="certificates">Certificates</TabsTrigger>
+            <TabsTrigger value="branding">Branding</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="profile">Profile</TabsTrigger>
           </TabsList>
@@ -790,7 +797,7 @@ const RecruiterDashboard = () => {
                         </div>
                       </div>
                       <div className="flex flex-col items-end gap-2">
-                        <Button variant="ghost" size="icon" onClick={() => toast({title: "Notes", description: "Private notes feature coming soon!"})}>
+                        <Button variant="ghost" size="icon" onClick={() => toast({title: "Notes", description: "Click to add private notes about this candidate."})}>
                           <MessageSquare className="w-4 h-4" />
                         </Button>
                         <Button variant="ghost" size="icon" onClick={() => {
@@ -843,6 +850,69 @@ const RecruiterDashboard = () => {
                           <Calendar className="w-4 h-4 mr-1" />
                           Interview
                         </Button>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <MessageSquare className="w-4 h-4 mr-1" />
+                              Feedback
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-md">
+                            <DialogHeader>
+                              <DialogTitle>Send Feedback to {candidate.name}</DialogTitle>
+                              <DialogDescription>
+                                Provide constructive feedback to help the candidate improve their application.
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <div>
+                                <Label htmlFor="feedback-type">Feedback Type</Label>
+                                <Select>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select feedback type" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="positive">Positive Feedback</SelectItem>
+                                    <SelectItem value="constructive">Constructive Feedback</SelectItem>
+                                    <SelectItem value="rejection">Rejection Feedback</SelectItem>
+                                    <SelectItem value="interview">Interview Feedback</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div>
+                                <Label htmlFor="feedback-message">Feedback Message</Label>
+                                <Textarea 
+                                  id="feedback-message"
+                                  placeholder="Share specific feedback about their application, skills, or areas for improvement..."
+                                  value={feedbackToCandidate}
+                                  onChange={(e) => setFeedbackToCandidate(e.target.value)}
+                                  className="min-h-[100px]"
+                                />
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Checkbox id="notify-candidate" />
+                                <Label htmlFor="notify-candidate" className="text-sm">
+                                  Send email notification to candidate
+                                </Label>
+                              </div>
+                              <div className="flex justify-end gap-2">
+                                <Button variant="outline" size="sm">
+                                  Save as Draft
+                                </Button>
+                                <Button size="sm" onClick={() => {
+                                  toast({
+                                    title: "Feedback Sent",
+                                    description: `Feedback sent to ${candidate.name} successfully.`
+                                  });
+                                  setFeedbackToCandidate('');
+                                }}>
+                                  <Send className="w-4 h-4 mr-1" />
+                                  Send Feedback
+                                </Button>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
                         <Button size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => handleCandidateAction(candidate.id, 'Shortlist')}>
                           <ThumbsUp className="w-4 h-4 mr-1" />
                           Shortlist
@@ -935,7 +1005,7 @@ const RecruiterDashboard = () => {
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Job & Internship Postings</h2>
               <div className="flex gap-2">
-                <Button variant="outline" onClick={() => toast({title: "Bulk Upload", description: "CSV/Excel bulk upload feature coming soon!"})}>
+                <Button variant="outline" onClick={() => toast({title: "Bulk Upload", description: "Upload multiple job postings via CSV/Excel format."})}>
                   <Upload className="w-4 h-4 mr-2" />
                   Bulk Upload
                 </Button>
@@ -945,6 +1015,125 @@ const RecruiterDashboard = () => {
                 </Button>
               </div>
             </div>
+
+            {/* Automated Posting Controls */}
+            <Card className="border-0 shadow-lg bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/30 dark:to-blue-950/30">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-green-500 rounded-lg">
+                      <Zap className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">Automated Job Posting</CardTitle>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Auto-distribute jobs to multiple platforms
+                      </p>
+                    </div>
+                  </div>
+                  <Switch 
+                    checked={autoPostingEnabled}
+                    onCheckedChange={setAutoPostingEnabled}
+                  />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-gray-900 dark:text-white">Platform Integration</h4>
+                    <div className="space-y-2">
+                      {[
+                        { name: "LinkedIn Jobs", enabled: true, posts: 12 },
+                        { name: "Indeed", enabled: true, posts: 8 },
+                        { name: "Glassdoor", enabled: false, posts: 0 },
+                        { name: "Company Website", enabled: true, posts: 15 }
+                      ].map((platform, index) => (
+                        <div key={index} className="flex items-center justify-between p-2 border border-gray-200 dark:border-gray-700 rounded-lg">
+                          <div className="flex items-center gap-2">
+                            <Switch checked={platform.enabled} />
+                            <span className="text-sm font-medium">{platform.name}</span>
+                          </div>
+                          <Badge variant="secondary" className="text-xs">
+                            {platform.posts} posts
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-gray-900 dark:text-white">Posting Schedule</h4>
+                    <div className="space-y-2">
+                      <div className="p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">Auto-post Time</span>
+                          <Select defaultValue="immediate">
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="immediate">Immediate</SelectItem>
+                              <SelectItem value="1hour">1 Hour Later</SelectItem>
+                              <SelectItem value="24hours">24 Hours Later</SelectItem>
+                              <SelectItem value="custom">Custom</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <div className="p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">Auto-expire After</span>
+                          <Select defaultValue="30days">
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="7days">7 Days</SelectItem>
+                              <SelectItem value="14days">14 Days</SelectItem>
+                              <SelectItem value="30days">30 Days</SelectItem>
+                              <SelectItem value="never">Never</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-gray-900 dark:text-white">Automation Stats</h4>
+                    <div className="space-y-2">
+                      <div className="p-3 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-lg font-bold text-green-600 dark:text-green-400">35</p>
+                            <p className="text-xs text-green-700 dark:text-green-300">Jobs Auto-Posted</p>
+                          </div>
+                          <Target className="w-6 h-6 text-green-500" />
+                        </div>
+                      </div>
+                      <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-lg font-bold text-blue-600 dark:text-blue-400">127</p>
+                            <p className="text-xs text-blue-700 dark:text-blue-300">Total Applications</p>
+                          </div>
+                          <Users className="w-6 h-6 text-blue-500" />
+                        </div>
+                      </div>
+                      <div className="p-3 bg-purple-50 dark:bg-purple-950/30 rounded-lg border border-purple-200 dark:border-purple-800">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-lg font-bold text-purple-600 dark:text-purple-400">89%</p>
+                            <p className="text-xs text-purple-700 dark:text-purple-300">Success Rate</p>
+                          </div>
+                          <Activity className="w-6 h-6 text-purple-500" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Job Creation Form Modal */}
             {showJobForm && (
@@ -2107,6 +2296,383 @@ const RecruiterDashboard = () => {
                       </AlertDialogContent>
                     </AlertDialog>
                   </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Certificate Verification Tab */}
+          <TabsContent value="certificates" className="space-y-6">
+            <Card className="border-0 shadow-xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+              <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-b border-blue-100 dark:border-blue-800">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-500 rounded-lg">
+                      <Shield className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent font-bold">
+                        Certificate Verification Center
+                      </CardTitle>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        Verify and manage candidate certificates and credentials
+                      </p>
+                    </div>
+                  </div>
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg">
+                    <Upload className="w-4 h-4 mr-2" />
+                    Bulk Verify
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Verification Queue */}
+                  <div className="lg:col-span-2">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Pending Verifications</h3>
+                        <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                          23 Pending
+                        </Badge>
+                      </div>
+                      <div className="space-y-3">
+                        {[
+                          { name: "John Smith", cert: "AWS Solutions Architect", institute: "Amazon Web Services", status: "pending", priority: "high" },
+                          { name: "Sarah Chen", cert: "Google Cloud Professional", institute: "Google Cloud", status: "pending", priority: "medium" },
+                          { name: "Mike Johnson", cert: "Microsoft Azure Fundamentals", institute: "Microsoft", status: "verified", priority: "low" },
+                          { name: "Lisa Wang", cert: "Cisco Network Associate", institute: "Cisco Systems", status: "rejected", priority: "medium" }
+                        ].map((item, index) => (
+                          <div key={index} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-all">
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-3">
+                                  <h4 className="font-medium text-gray-900 dark:text-white">{item.name}</h4>
+                                  <Badge variant={item.priority === 'high' ? 'destructive' : item.priority === 'medium' ? 'default' : 'secondary'} className="text-xs">
+                                    {item.priority} priority
+                                  </Badge>
+                                </div>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{item.cert}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-500">{item.institute}</p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Badge variant={
+                                  item.status === 'verified' ? 'default' : 
+                                  item.status === 'pending' ? 'secondary' : 
+                                  'destructive'
+                                } className={
+                                  item.status === 'verified' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                                  item.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                                  'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                                }>
+                                  {item.status === 'verified' ? <CheckCircle className="w-3 h-3 mr-1" /> : 
+                                   item.status === 'pending' ? <Clock className="w-3 h-3 mr-1" /> : 
+                                   <X className="w-3 h-3 mr-1" />}
+                                  {item.status}
+                                </Badge>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="sm">
+                                      <MoreHorizontal className="w-4 h-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem>
+                                      <Eye className="w-4 h-4 mr-2" />
+                                      View Certificate
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                      <CheckCircle className="w-4 h-4 mr-2" />
+                                      Verify
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem className="text-red-600">
+                                      <X className="w-4 h-4 mr-2" />
+                                      Reject
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Verification Stats */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Verification Stats</h3>
+                    <div className="space-y-3">
+                      <div className="p-4 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-2xl font-bold text-green-600 dark:text-green-400">156</p>
+                            <p className="text-sm text-green-700 dark:text-green-300">Verified This Month</p>
+                          </div>
+                          <CheckCircle className="w-8 h-8 text-green-500" />
+                        </div>
+                      </div>
+                      <div className="p-4 bg-yellow-50 dark:bg-yellow-950/30 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">23</p>
+                            <p className="text-sm text-yellow-700 dark:text-yellow-300">Pending Review</p>
+                          </div>
+                          <Clock className="w-8 h-8 text-yellow-500" />
+                        </div>
+                      </div>
+                      <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">94%</p>
+                            <p className="text-sm text-blue-700 dark:text-blue-300">Verification Rate</p>
+                          </div>
+                          <Award className="w-8 h-8 text-blue-500" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                      <h4 className="font-medium text-gray-900 dark:text-white mb-3">Quick Actions</h4>
+                      <div className="space-y-2">
+                        <Button variant="outline" className="w-full justify-start">
+                          <Upload className="w-4 h-4 mr-2" />
+                          Bulk Upload Certificates
+                        </Button>
+                        <Button variant="outline" className="w-full justify-start">
+                          <Download className="w-4 h-4 mr-2" />
+                          Export Verification Report
+                        </Button>
+                        <Button variant="outline" className="w-full justify-start">
+                          <Settings className="w-4 h-4 mr-2" />
+                          Verification Settings
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Company Branding Tab */}
+          <TabsContent value="branding" className="space-y-6">
+            <Card className="border-0 shadow-xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+              <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30 border-b border-purple-100 dark:border-purple-800">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-purple-500 rounded-lg">
+                      <Building2 className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent font-bold">
+                        Company Branding Center
+                      </CardTitle>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        Customize your company's presence and job posting templates
+                      </p>
+                    </div>
+                  </div>
+                  <Button className="bg-purple-600 hover:bg-purple-700 text-white shadow-lg">
+                    <Rocket className="w-4 h-4 mr-2" />
+                    Preview Brand
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {/* Brand Settings */}
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Brand Identity</h3>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Company Logo
+                          </label>
+                          <div className="flex items-center gap-4">
+                            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                              <Building2 className="w-8 h-8 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <Button variant="outline" size="sm">
+                                <Upload className="w-4 h-4 mr-2" />
+                                Upload Logo
+                              </Button>
+                              <p className="text-xs text-gray-500 mt-1">PNG, JPG up to 2MB</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Primary Brand Color
+                          </label>
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 bg-purple-500 rounded-lg border-2 border-white shadow-lg"></div>
+                            <Input 
+                              type="text" 
+                              value="#8B5CF6" 
+                              className="flex-1"
+                              placeholder="Enter hex color"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Company Tagline
+                          </label>
+                          <Input 
+                            placeholder="Innovation at its finest" 
+                            className="w-full"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Company Description
+                          </label>
+                          <Textarea 
+                            placeholder="Tell candidates about your company culture, values, and what makes you unique..." 
+                            className="w-full h-24"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Job Posting Templates</h3>
+                      <div className="space-y-3">
+                        {[
+                          { name: "Software Engineer Template", usage: "45 jobs", status: "active" },
+                          { name: "Marketing Manager Template", usage: "23 jobs", status: "active" },
+                          { name: "Data Scientist Template", usage: "12 jobs", status: "draft" },
+                          { name: "Product Manager Template", usage: "8 jobs", status: "active" }
+                        ].map((template, index) => (
+                          <div key={index} className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+                            <div>
+                              <p className="font-medium text-gray-900 dark:text-white">{template.name}</p>
+                              <p className="text-sm text-gray-500">Used in {template.usage}</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Badge variant={template.status === 'active' ? 'default' : 'secondary'}>
+                                {template.status}
+                              </Badge>
+                              <Button variant="ghost" size="sm">
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                        <Button variant="outline" className="w-full">
+                          <Plus className="w-4 h-4 mr-2" />
+                          Create New Template
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Brand Preview & Social */}
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Brand Preview</h3>
+                      <div className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800">
+                        <div className="text-center">
+                          <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                            <Building2 className="w-10 h-10 text-white" />
+                          </div>
+                          <h4 className="text-xl font-bold text-gray-900 dark:text-white">TechCorp Solutions</h4>
+                          <p className="text-purple-600 dark:text-purple-400 text-sm mt-1">Innovation at its finest</p>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm mt-3 max-w-sm mx-auto">
+                            Leading technology solutions company specializing in innovative software development and digital transformation.
+                          </p>
+                          <div className="flex justify-center gap-2 mt-4">
+                            <Button size="sm" className="bg-purple-600 hover:bg-purple-700">
+                              View Jobs
+                            </Button>
+                            <Button size="sm" variant="outline">
+                              Learn More
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Social Media Integration</h3>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                              <Globe className="w-4 h-4 text-white" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-900 dark:text-white">LinkedIn</p>
+                              <p className="text-sm text-gray-500">Auto-post jobs</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Switch 
+                              checked={autoPostingEnabled}
+                              onCheckedChange={setAutoPostingEnabled}
+                            />
+                            <Button variant="ghost" size="sm">
+                              <Settings className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
+                              <Globe className="w-4 h-4 text-white" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-900 dark:text-white">Indeed</p>
+                              <p className="text-sm text-gray-500">Sync applications</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Switch />
+                            <Button variant="ghost" size="sm">
+                              <Settings className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+                              <Globe className="w-4 h-4 text-white" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-900 dark:text-white">Company Website</p>
+                              <p className="text-sm text-gray-500">Embed job board</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Switch defaultChecked />
+                            <Button variant="ghost" size="sm">
+                              <Settings className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-4 bg-purple-50 dark:bg-purple-950/30 rounded-lg border border-purple-200 dark:border-purple-800">
+                      <div className="flex items-start gap-3">
+                        <Lightbulb className="w-5 h-5 text-purple-600 mt-0.5" />
+                        <div>
+                          <h4 className="font-medium text-purple-900 dark:text-purple-100">Pro Tip</h4>
+                          <p className="text-sm text-purple-700 dark:text-purple-300 mt-1">
+                            Consistent branding across all platforms increases candidate recognition by 67% and application rates by 23%.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

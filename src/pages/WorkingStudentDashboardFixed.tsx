@@ -13,6 +13,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { useToast } from '@/hooks/use-toast';
 import { useTheme } from '@/contexts/ThemeProvider';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { generateStudentProfilePDF, generateResumePDF } from '@/utils/pdfUtils';
+import { useAIFeatures } from '@/hooks/useAIFeatures';
+import { AIResultsDisplay } from '@/components/AIResultsDisplay';
 import { 
   User, 
   Briefcase, 
@@ -110,6 +113,16 @@ const WorkingStudentDashboard = () => {
   const [skillGapAnalysis, setSkillGapAnalysis] = useState([]);
   const [mockInterviewsCompleted, setMockInterviewsCompleted] = useState(3);
   const [placementReadiness, setPlacementReadiness] = useState(85);
+  
+  // AI Features State
+  const aiFeatures = useAIFeatures();
+  const [aiResults, setAiResults] = useState<{
+    matching?: string;
+    interview?: string;
+    resume?: string;
+    career?: string;
+  }>({});
+  const [showAIResults, setShowAIResults] = useState(false);
 
   const handleSaveProfile = () => {
     // Basic validation
@@ -219,6 +232,139 @@ const WorkingStudentDashboard = () => {
     }, 1500);
   };
 
+  const handleDownloadProfile = () => {
+    const studentData = {
+      name: profileData.name,
+      email: profileData.email,
+      phone: profileData.phone,
+      department: 'Computer Science',
+      year: '3rd Year',
+      cgpa: profileData.cgpa,
+      skills: ['JavaScript', 'React', 'Node.js', 'Python', 'MongoDB'],
+      bio: profileData.bio
+    };
+    
+    generateStudentProfilePDF(studentData);
+    toast({
+      title: "Profile Downloaded",
+      description: "Your student profile has been downloaded as PDF",
+    });
+  };
+
+  const handleDownloadResume = (templateType: string) => {
+    const studentData = {
+      name: profileData.name,
+      email: profileData.email,
+      phone: profileData.phone,
+      department: 'Computer Science',
+      degree: 'B.Tech Computer Science',
+      college: profileData.university,
+      year: '2021-2025',
+      cgpa: profileData.cgpa,
+      skills: ['JavaScript', 'React', 'Node.js', 'Python', 'MongoDB']
+    };
+    
+    generateResumePDF(templateType, studentData);
+    toast({
+      title: "Resume Downloaded",
+      description: `${templateType} resume template has been downloaded as PDF`,
+    });
+  };
+
+  // AI-Powered Features
+  const handleAIMatching = async () => {
+    const studentProfile = {
+      name: profileData.name,
+      skills: ['JavaScript', 'React', 'Node.js', 'Python', 'MongoDB'],
+      cgpa: profileData.cgpa,
+      department: 'Computer Science',
+      experience: 'Intermediate',
+      interests: ['Web Development', 'Machine Learning', 'Data Science']
+    };
+
+    const opportunities = [
+      {
+        title: 'Frontend Developer Intern',
+        company: 'TechCorp',
+        requirements: ['React', 'JavaScript', 'CSS']
+      },
+      {
+        title: 'Full Stack Developer',
+        company: 'InnovateLabs',
+        requirements: ['Node.js', 'MongoDB', 'React']
+      },
+      {
+        title: 'Data Science Intern',
+        company: 'DataScience Inc',
+        requirements: ['Python', 'Machine Learning', 'Analytics']
+      }
+    ];
+
+    try {
+      const result = await aiFeatures.matchStudentToOpportunities(studentProfile, opportunities);
+      setAiResults(prev => ({ ...prev, matching: result }));
+      setShowAIResults(true);
+    } catch (error) {
+      console.error('AI Matching Error:', error);
+    }
+  };
+
+  const handleGenerateInterviewQuestions = async () => {
+    const skills = ['JavaScript', 'React', 'Node.js'];
+    const jobRole = 'Full Stack Developer';
+
+    try {
+      const result = await aiFeatures.generateInterviewQuestions(jobRole, skills, 'medium');
+      setAiResults(prev => ({ ...prev, interview: result }));
+      setShowAIResults(true);
+    } catch (error) {
+      console.error('Interview Questions Error:', error);
+    }
+  };
+
+  const handleResumeAnalysis = async () => {
+    const resumeContent = `
+    Name: ${profileData.name}
+    Email: ${profileData.email}
+    CGPA: ${profileData.cgpa}
+    Skills: JavaScript, React, Node.js, Python, MongoDB
+    Experience: 2 years of project experience
+    Projects: E-commerce website, AI chatbot, Mobile app
+    `;
+
+    try {
+      const result = await aiFeatures.analyzeResume(resumeContent, 'Software Developer');
+      setAiResults(prev => ({ ...prev, resume: result }));
+      setShowAIResults(true);
+    } catch (error) {
+      console.error('Resume Analysis Error:', error);
+    }
+  };
+
+  const handleCareerGuidance = async () => {
+    const studentProfile = {
+      skills: ['JavaScript', 'React', 'Node.js', 'Python'],
+      interests: ['Web Development', 'AI/ML', 'Data Science'],
+      cgpa: profileData.cgpa,
+      year: '3rd Year',
+      department: 'Computer Science'
+    };
+
+    const industryTrends = {
+      techGrowth: '25% increase in demand',
+      hotSkills: ['AI/ML', 'Cloud Computing', 'DevOps'],
+      salaryTrends: 'Average increase of 12%'
+    };
+
+    try {
+      const result = await aiFeatures.generateCareerGuidance(studentProfile, industryTrends);
+      setAiResults(prev => ({ ...prev, career: result }));
+      setShowAIResults(true);
+    } catch (error) {
+      console.error('Career Guidance Error:', error);
+    }
+  };
+
   const handleGoToSettings = () => {
     setActiveTab('settings');
     toast({
@@ -262,7 +408,7 @@ const WorkingStudentDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pt-12">
       {/* Header */}
       <div className="border-b">
         <div className="flex h-16 items-center px-4 justify-between">
@@ -334,13 +480,14 @@ const WorkingStudentDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid w-full grid-cols-10 text-xs">
+          <TabsList className="grid w-full grid-cols-11 text-xs">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="opportunities">Jobs</TabsTrigger>
             <TabsTrigger value="applications">Applications</TabsTrigger>
             <TabsTrigger value="interviews">Interviews</TabsTrigger>
             <TabsTrigger value="resume">Resume</TabsTrigger>
+            <TabsTrigger value="ai-assistant">AI Assistant</TabsTrigger>
             <TabsTrigger value="prep">Prep</TabsTrigger>
             <TabsTrigger value="learn">Learn</TabsTrigger>
             <TabsTrigger value="community">Community</TabsTrigger>
@@ -1083,19 +1230,155 @@ const WorkingStudentDashboard = () => {
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-3">
                     {['Professional', 'Creative', 'Technical', 'Academic'].map((template, index) => (
-                      <div key={index} className="border rounded-lg p-3 hover:bg-accent cursor-pointer">
+                      <div 
+                        key={index} 
+                        className="border rounded-lg p-3 hover:bg-accent cursor-pointer"
+                        onClick={() => handleDownloadResume(template)}
+                      >
                         <div className="h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded mb-2"></div>
                         <p className="text-sm font-medium text-center">{template}</p>
                       </div>
                     ))}
                   </div>
-                  <Button className="w-full" variant="outline">
+                  <Button 
+                    className="w-full" 
+                    variant="outline"
+                    onClick={handleDownloadProfile}
+                  >
                     <Download className="w-4 h-4 mr-2" />
-                    Download PDF
+                    Download Profile PDF
                   </Button>
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* AI Assistant Tab */}
+          <TabsContent value="ai-assistant" className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* AI Features Cards */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="w-5 h-5 text-blue-500" />
+                    AI-Powered Matching
+                  </CardTitle>
+                  <CardDescription>
+                    Find the perfect opportunities based on your skills and preferences
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    onClick={handleAIMatching} 
+                    disabled={aiFeatures.loading}
+                    className="w-full"
+                  >
+                    {aiFeatures.loading ? 'Analyzing...' : 'Find My Matches'}
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Brain className="w-5 h-5 text-purple-500" />
+                    Interview Questions
+                  </CardTitle>
+                  <CardDescription>
+                    Generate personalized interview questions for practice
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    onClick={handleGenerateInterviewQuestions} 
+                    disabled={aiFeatures.loading}
+                    className="w-full"
+                  >
+                    {aiFeatures.loading ? 'Generating...' : 'Generate Questions'}
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-orange-500" />
+                    Resume Analysis
+                  </CardTitle>
+                  <CardDescription>
+                    Get AI-powered feedback on your resume
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    onClick={handleResumeAnalysis} 
+                    disabled={aiFeatures.loading}
+                    className="w-full"
+                  >
+                    {aiFeatures.loading ? 'Analyzing...' : 'Analyze Resume'}
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-green-500" />
+                    Career Guidance
+                  </CardTitle>
+                  <CardDescription>
+                    Get personalized career path recommendations
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    onClick={handleCareerGuidance} 
+                    disabled={aiFeatures.loading}
+                    className="w-full"
+                  >
+                    {aiFeatures.loading ? 'Generating...' : 'Get Career Advice'}
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* AI Results Display */}
+            {showAIResults && (
+              <div className="space-y-4">
+                {aiResults.matching && (
+                  <AIResultsDisplay
+                    title="AI-Powered Opportunity Matching"
+                    content={aiResults.matching}
+                    type="matching"
+                    loading={false}
+                  />
+                )}
+                {aiResults.interview && (
+                  <AIResultsDisplay
+                    title="Interview Questions & Preparation"
+                    content={aiResults.interview}
+                    type="interview"
+                    loading={false}
+                  />
+                )}
+                {aiResults.resume && (
+                  <AIResultsDisplay
+                    title="Resume Analysis & Recommendations"
+                    content={aiResults.resume}
+                    type="resume"
+                    loading={false}
+                  />
+                )}
+                {aiResults.career && (
+                  <AIResultsDisplay
+                    title="Career Guidance & Path Recommendations"
+                    content={aiResults.career}
+                    type="career"
+                    loading={false}
+                  />
+                )}
+              </div>
+            )}
           </TabsContent>
 
           {/* Interview Preparation Tab */}

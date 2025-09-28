@@ -116,6 +116,10 @@ bun run dev
 - **jsPDF 3.0.3** - Client-side PDF generation
 - **html2canvas 1.4.1** - Screenshot and canvas generation
 
+### AI & Machine Learning
+- **Groq API** - High-performance AI inference for intelligent features
+- **Custom AI Client** - Fallback system with intelligent mock responses
+
 ### Development Tools
 - **ESLint 9.32.0** - JavaScript/TypeScript linting with custom rules
 - **PostCSS & Autoprefixer** - CSS transformation and vendor prefixing
@@ -158,6 +162,13 @@ This solution directly addresses the **Smart India Hackathon** problem statement
 ### Core Functionality
 - **Integrated Role-Based Portal** - Specialized dashboards for Students, Faculty, Placement Cell, and Industry Partners
 - **Smart Opportunity Matching** - AI-driven recommendations based on skills, preferences, and academic performance
+
+### 🤖 AI-Powered Features
+- **Intelligent Matching System** - Groq AI analyzes student profiles and matches with perfect opportunities
+- **Real-Time Analytics** - AI-generated insights for placement trends and predictions
+- **Interview Preparation** - Personalized interview questions and practice scenarios
+- **Resume Optimization** - AI analysis with ATS optimization and improvement suggestions
+- **Career Guidance** - Personalized career path recommendations based on industry trends
 - **Automated Approval Workflows** - Streamlined mentor approvals with digital signatures
 - **Interview Management System** - Calendar synchronization with academic timetables
 - **Application Tracking** - End-to-end journey monitoring from application to placement

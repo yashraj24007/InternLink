@@ -8,6 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -520,7 +521,7 @@ const MentorDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 pt-12">
       <div className="container mx-auto p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -834,6 +835,133 @@ const MentorDashboard = () => {
                 </Card>
               ))}
             </div>
+
+            {/* Feedback Submission Section */}
+            <Card className="border-none shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5 text-orange-600" />
+                  Submit Student Feedback
+                </CardTitle>
+                <CardDescription>
+                  Provide feedback on student performance and internship applications
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="student-select">Select Student</Label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose a student" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {assignedStudents.map((student) => (
+                          <SelectItem key={student.id} value={student.id.toString()}>
+                            {student.name} - {student.department}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="feedback-type">Feedback Type</Label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select feedback type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="internship">Internship Performance</SelectItem>
+                        <SelectItem value="application">Application Review</SelectItem>
+                        <SelectItem value="interview">Interview Preparation</SelectItem>
+                        <SelectItem value="skills">Skills Assessment</SelectItem>
+                        <SelectItem value="career">Career Guidance</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="rating">Overall Rating</Label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Rate performance" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="5">⭐⭐⭐⭐⭐ Excellent</SelectItem>
+                        <SelectItem value="4">⭐⭐⭐⭐ Good</SelectItem>
+                        <SelectItem value="3">⭐⭐⭐ Average</SelectItem>
+                        <SelectItem value="2">⭐⭐ Needs Improvement</SelectItem>
+                        <SelectItem value="1">⭐ Poor</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="company">Company/Organization</Label>
+                    <Input 
+                      id="company" 
+                      placeholder="Enter company name (if applicable)" 
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="feedback-text">Detailed Feedback</Label>
+                  <Textarea
+                    id="feedback-text"
+                    placeholder="Provide detailed feedback on student's performance, strengths, areas for improvement, and recommendations..."
+                    rows={6}
+                  />
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="strengths">Key Strengths</Label>
+                    <Input 
+                      id="strengths" 
+                      placeholder="Communication, Technical skills, etc." 
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="improvements">Areas for Improvement</Label>
+                    <Input 
+                      id="improvements" 
+                      placeholder="Time management, Presentation skills, etc." 
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <input type="checkbox" id="auto-update" className="rounded" />
+                  <Label htmlFor="auto-update" className="text-sm">
+                    Auto-update student profile with this feedback
+                  </Label>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={() => {
+                      toast({
+                        title: "Feedback Submitted",
+                        description: "Student feedback has been recorded and will be auto-updated to their profile.",
+                      });
+                    }}
+                  >
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    Submit Feedback
+                  </Button>
+                  <Button variant="outline">
+                    <FileText className="w-4 h-4 mr-2" />
+                    Save as Draft
+                  </Button>
+                  <Button variant="outline">
+                    <Download className="w-4 h-4 mr-2" />
+                    Export PDF
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Approvals Tab */}

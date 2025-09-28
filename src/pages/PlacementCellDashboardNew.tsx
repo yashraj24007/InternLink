@@ -9,10 +9,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
 import { useTheme } from '@/contexts/ThemeProvider';
+import { generatePlacementReportPDF } from '@/utils/pdfUtils';
+import { useAIFeatures } from '@/hooks/useAIFeatures';
+import { AIResultsDisplay } from '@/components/AIResultsDisplay';
 import { 
   Users, 
   Briefcase, 
@@ -66,7 +70,8 @@ import {
   ExternalLink,
   MessageSquare,
   TrendingDown,
-  AlertTriangle
+  AlertTriangle,
+  Brain
 } from 'lucide-react';
 
 const PlacementCellDashboard = () => {
@@ -76,6 +81,11 @@ const PlacementCellDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [isLoading, setIsLoading] = useState(false);
+  
+  // AI Features State
+  const aiFeatures = useAIFeatures();
+  const [aiInsights, setAiInsights] = useState<string>('');
+  const [showAIInsights, setShowAIInsights] = useState(false);
 
   // Comprehensive placement statistics
   const [placementStats, setPlacementStats] = useState({
@@ -203,6 +213,31 @@ const PlacementCellDashboard = () => {
     });
   };
 
+  const handleGeneratePlacementReport = () => {
+    generatePlacementReportPDF(placementStats);
+    toast({
+      title: "Report Generated",
+      description: "Placement report has been downloaded as PDF",
+    });
+  };
+
+  const handleAIPlacementInsights = async () => {
+    try {
+      const result = await aiFeatures.generatePlacementInsights({
+        totalStudents: placementStats.totalStudents,
+        placedStudents: placementStats.placedStudents,
+        placementRate: placementStats.placementRate,
+        averagePackage: placementStats.averageSalary,
+        topCompanies: ['TCS', 'Infosys', 'Wipro', 'Amazon', 'Microsoft'],
+        departmentStats: departmentStats
+      });
+      setAiInsights(result);
+      setShowAIInsights(true);
+    } catch (error) {
+      console.error('AI Placement Insights Error:', error);
+    }
+  };
+
   // Placement cell stats similar to student/mentor dashboard
   const placementCellStats = [
     { title: "Total Students", value: placementStats.totalStudents.toLocaleString(), icon: GraduationCap, color: "text-blue-600" },
@@ -212,7 +247,7 @@ const PlacementCellDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pt-12">
       {/* Header */}
       <div className="border-b">
         <div className="flex h-16 items-center px-4 justify-between">
@@ -1613,6 +1648,35 @@ const PlacementCellDashboard = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* AI-Powered Placement Insights */}
+            <Card className="border-none shadow-lg lg:col-span-2">
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Brain className="h-5 w-5 text-purple-500" />
+                  <span>AI-Powered Placement Insights</span>
+                </CardTitle>
+                <CardDescription>Get intelligent analysis and predictions for placement trends</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Button 
+                  onClick={handleAIPlacementInsights} 
+                  disabled={aiFeatures.loading}
+                  className="w-full"
+                >
+                  {aiFeatures.loading ? 'Generating AI Insights...' : 'Generate AI Placement Analysis'}
+                </Button>
+                
+                {showAIInsights && aiInsights && (
+                  <AIResultsDisplay
+                    title="AI-Generated Placement Insights"
+                    content={aiInsights}
+                    type="analytics"
+                    loading={false}
+                  />
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Administrative Controls Tab */}
@@ -1893,6 +1957,137 @@ const PlacementCellDashboard = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Workflow Automation */}
+              <Card className="border-none shadow-lg lg:col-span-2">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Zap className="h-5 w-5 text-yellow-600" />
+                    <span>Workflow Automation</span>
+                  </CardTitle>
+                  <CardDescription>Automated processes for student matching and notifications</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {/* Auto-Match System */}
+                    <div className="space-y-4">
+                      <h4 className="font-semibold flex items-center gap-2">
+                        <Target className="w-4 h-4 text-blue-500" />
+                        Auto-Match & Notify System
+                      </h4>
+                      
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between p-3 border rounded-lg">
+                          <div>
+                            <p className="font-medium">Auto-Match Eligible Students</p>
+                            <p className="text-sm text-muted-foreground">Automatically match students to new opportunities</p>
+                          </div>
+                          <Switch defaultChecked />
+                        </div>
+
+                        <div className="flex items-center justify-between p-3 border rounded-lg">
+                          <div>
+                            <p className="font-medium">Instant Notifications</p>
+                            <p className="text-sm text-muted-foreground">Send notifications to eligible students</p>
+                          </div>
+                          <Switch defaultChecked />
+                        </div>
+
+                        <div className="flex items-center justify-between p-3 border rounded-lg">
+                          <div>
+                            <p className="font-medium">Smart Filtering</p>
+                            <p className="text-sm text-muted-foreground">Filter by CGPA, skills, and department</p>
+                          </div>
+                          <Switch defaultChecked />
+                        </div>
+                      </div>
+
+                      <Button 
+                        className="w-full"
+                        onClick={() => {
+                          toast({
+                            title: "Auto-Match Initiated",
+                            description: "Processing 234 students for 12 new opportunities. Students will be notified automatically.",
+                          });
+                        }}
+                      >
+                        <Target className="w-4 h-4 mr-2" />
+                        Run Auto-Match Now
+                      </Button>
+                    </div>
+
+                    {/* Interview Scheduling Tool */}
+                    <div className="space-y-4">
+                      <h4 className="font-semibold flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-green-500" />
+                        Interview Scheduling Tool
+                      </h4>
+
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between p-3 border rounded-lg">
+                          <div>
+                            <p className="font-medium">Auto-Schedule Interviews</p>
+                            <p className="text-sm text-muted-foreground">Sync with academic timetable</p>
+                          </div>
+                          <Switch defaultChecked />
+                        </div>
+
+                        <div className="flex items-center justify-between p-3 border rounded-lg">
+                          <div>
+                            <p className="font-medium">Conflict Detection</p>
+                            <p className="text-sm text-muted-foreground">Avoid scheduling conflicts automatically</p>
+                          </div>
+                          <Switch defaultChecked />
+                        </div>
+
+                        <div className="flex items-center justify-between p-3 border rounded-lg">
+                          <div>
+                            <p className="font-medium">Reminder Notifications</p>
+                            <p className="text-sm text-muted-foreground">Send interview reminders to students</p>
+                          </div>
+                          <Switch defaultChecked />
+                        </div>
+                      </div>
+
+                      <Button 
+                        className="w-full"
+                        onClick={() => {
+                          toast({
+                            title: "Scheduling Tool Activated",
+                            description: "42 interviews scheduled for this week. All participants notified.",
+                          });
+                        }}
+                      >
+                        <Calendar className="w-4 h-4 mr-2" />
+                        Auto-Schedule Interviews
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Automation Statistics */}
+                  <div className="mt-6 p-4 bg-muted/50 rounded-lg">
+                    <h5 className="font-semibold mb-3">Automation Statistics (This Week)</h5>
+                    <div className="grid grid-cols-4 gap-4 text-center">
+                      <div>
+                        <div className="text-2xl font-bold text-blue-600">234</div>
+                        <div className="text-sm text-muted-foreground">Students Auto-Matched</div>
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold text-green-600">156</div>
+                        <div className="text-sm text-muted-foreground">Notifications Sent</div>
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold text-orange-600">42</div>
+                        <div className="text-sm text-muted-foreground">Interviews Scheduled</div>
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold text-purple-600">89%</div>
+                        <div className="text-sm text-muted-foreground">Success Rate</div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
 
@@ -1934,7 +2129,10 @@ const PlacementCellDashboard = () => {
                   </Select>
                   
                   <div className="grid grid-cols-2 gap-2">
-                    <Button variant="outline">
+                    <Button 
+                      variant="outline"
+                      onClick={handleGeneratePlacementReport}
+                    >
                       <FileText className="h-4 w-4 mr-2" />
                       PDF Report
                     </Button>
