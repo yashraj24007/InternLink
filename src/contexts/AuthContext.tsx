@@ -1,4 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+import { testSupabaseConnection, initializeSupabaseSchema } from '@/lib/supabase-test';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 export type UserRole = 'student' | 'mentor' | 'recruiter' | 'admin' | 'placement_cell';
 

@@ -36,9 +36,18 @@ import {
   MapPin,
   Clock,
   Facebook,
-  Phone
+  Phone,
+  AlertTriangle,
+  ArrowDown,
+  FileSpreadsheet,
+  TrendingDown,
+  LogOut
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import AOS from "aos";
+import "aos/dist/aos.css";
+import { Fade, Slide } from "react-awesome-reveal";
 import { ThemeSwitch } from "@/components/ui/theme-switch";
 import { 
   DropdownMenu, 
@@ -50,14 +59,23 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { testSupabaseConnection, initializeSupabaseSchema } from "@/lib/supabase-test";
 import campusHero from "@/assets/campus-hero.jpg";
 import placementSuccess from "@/assets/placement-success.jpg";
 import studentsWorking from "@/assets/students-working.jpg";
 import dashboardPreview from "@/assets/dashboard-preview.jpg";
 
+import { useEffect, useState } from "react";
+
 const Landing = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    AOS.init({ duration: 800, once: true });
+  }, []);
+
+
 
   const handleRestrictedFeature = (featureName: string) => {
     if (user) {
@@ -114,6 +132,35 @@ const Landing = () => {
     toast.info("Demo coming soon!", {
       description: "We're preparing an interactive demo for you"
     });
+  };
+
+  const testSupabase = async () => {
+    toast.info("Testing Supabase connection...", {
+      description: "Checking database connectivity"
+    });
+    
+    try {
+      const connectionTest = await testSupabaseConnection();
+      const schemaTest = await initializeSupabaseSchema();
+      
+      if (connectionTest.success && schemaTest.success) {
+        toast.success("Supabase is working perfectly!", {
+          description: "Database connection and schema verified"
+        });
+      } else if (connectionTest.success && schemaTest.needsSetup) {
+        toast.warning("Supabase connected but needs schema setup", {
+          description: "Database tables need to be created"
+        });
+      } else {
+        toast.error("Supabase connection issues", {
+          description: connectionTest.error || schemaTest.error || "Unknown error"
+        });
+      }
+    } catch (error) {
+      toast.error("Supabase test failed", {
+        description: "Unable to connect to database"
+      });
+    }
   };
 
   // Function to check if user can access a specific role dashboard
@@ -178,34 +225,45 @@ const Landing = () => {
   ];
 
   const stats = [
-    { number: "2,500+", label: "Active Students" },
-    { number: "150+", label: "Partner Companies" },
-    { number: "85%", label: "Success Rate" },
-    { number: "120+", label: "Opportunities Monthly" }
+    { number: "70%", label: "Time Saved", subtitle: "Automated workflows" },
+    { number: "80%", label: "Less Admin Work", subtitle: "Manual tasks eliminated" },
+    { number: "65%", label: "Better Matching", subtitle: "AI-powered recommendations" },
+    { number: "40%", label: "More Placements", subtitle: "Increased conversion rate" }
   ];
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="border-b bg-background/80 backdrop-blur-lg sticky top-12 z-40 shadow-md transition-all duration-300">
+  <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center">
-              <GraduationCap className="w-6 h-6 text-primary-foreground" />
+            <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary-light rounded-lg flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-110">
+              <GraduationCap className="w-6 h-6 text-primary-foreground animate-pulse" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-foreground">InternLink</h1>
+              <h1 className="text-xl font-extrabold text-foreground tracking-tight drop-shadow-sm transition-colors duration-300 hover:text-primary">InternLink</h1>
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {/* Supabase Test Button (Development Only) */}
+            {process.env.NODE_ENV === 'development' && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={testSupabase}
+                className="text-xs"
+              >
+                Test DB
+              </Button>
+            )}
             <ThemeSwitch />
             
             {user ? (
               /* Show role-specific dashboard button for authenticated users */
               <div className="flex items-center gap-3">
                 {/* User Profile Indicator */}
-                <div className="flex items-center gap-2 bg-muted/50 rounded-full px-3 py-1 hover:bg-muted/70 transition-colors">
-                  <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                <div className="flex items-center gap-2 bg-muted/60 rounded-full px-3 py-1 shadow transition-all duration-300 hover:bg-muted/80 hover:shadow-lg">
+                  <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center animate-bounce">
                     {user.role === 'admin' && <BarChart3 className="w-3 h-3 text-primary-foreground" />}
                     {user.role === 'student' && <GraduationCap className="w-3 h-3 text-primary-foreground" />}
                     {user.role === 'mentor' && <User className="w-3 h-3 text-primary-foreground" />}
@@ -214,75 +272,102 @@ const Landing = () => {
                   </div>
                   <div className="flex flex-col">
                     <span className="text-xs text-muted-foreground">Welcome back</span>
-                    <span className="text-sm font-medium capitalize">{user.role}</span>
+                    <span className="text-sm font-semibold capitalize text-foreground tracking-wide">{user.role}</span>
                   </div>
                 </div>
-                
                 {/* Role-specific Dashboard Button */}
-                <Button variant="default" size="sm" asChild>
+                <Button variant="default" size="sm" asChild className="transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg">
                   <Link to={getRoleDashboard(user.role).path}>
                     {getRoleDashboard(user.role).label}
                   </Link>
                 </Button>
-                
-                {/* Only show dashboard button, remove sign out */}
+                {/* Logout Button */}
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => {
+                    logout();
+                    toast.success("Logged out successfully!");
+                  }}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <LogOut className="w-4 h-4" />
+                </Button>
               </div>
             ) : (
-              // Show only Login button for guests
+              // Show navigation and auth buttons for guests
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" asChild>
+                <Button variant="ghost" size="sm" asChild className="transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg">
+                  <Link to="/signup">Sign Up</Link>
+                </Button>
+                <Button variant="default" size="sm" asChild className="transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg">
                   <Link to="/login">Login</Link>
                 </Button>
               </div>
             )}
           </div>
         </div>
-      </header>
+  </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-hero">
-        <div className="absolute inset-0 bg-black/20"></div>
+  <Fade triggerOnce>
+  <section className="relative overflow-hidden bg-gradient-to-br from-blue-900 via-purple-900 to-slate-900 min-h-screen flex items-center">
         <div 
-          className="absolute inset-0 bg-cover bg-center opacity-30"
+          className="absolute inset-0 bg-cover bg-center opacity-60"
           style={{ backgroundImage: `url(${campusHero})` }}
         ></div>
-        <div className="relative container mx-auto px-4 py-24 text-center text-white">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-            Your Gateway to
+        <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/20 to-black/50"></div>
+        <div className="relative container mx-auto px-4 py-24 text-center text-white z-10" data-aos="fade-up">
+          <motion.h1
+            className="text-5xl md:text-7xl font-bold mb-6 leading-tight"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            End the Chaos of
             <span className="block bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
-              Career Success
+              Campus Placements
             </span>
-          </h1>
-          <p className="text-xl md:text-2xl mb-12 max-w-3xl mx-auto leading-relaxed opacity-90">
-            Connect students with industry opportunities through our comprehensive career development platform
-          </p>
+          </motion.h1>
+          <motion.p
+            className="text-xl md:text-2xl mb-12 max-w-3xl mx-auto leading-relaxed opacity-90"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            Replace scattered WhatsApp groups, endless emails, and manual spreadsheets with one intelligent platform for internships and placements
+          </motion.p>
           {!user ? (
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                variant="hero" 
-                size="xl" 
-                className="text-lg shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105"
-                onClick={() => {
-                  toast.success("Redirecting to Sign Up!", {
-                    description: "Create your account and start your journey"
-                  });
-                  setTimeout(() => {
-                    window.location.href = "/signup";
-                  }, 1000);
-                }}
-              >
-                Get Started Today
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-              <Button 
-                variant="outline" 
-                size="xl" 
-                className="text-lg border-white/30 text-white hover:bg-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-105"
-                onClick={handleDemoClick}
-              >
-                <Play className="w-5 h-5 mr-2" />
-                Watch Demo
-              </Button>
+              <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.6, delay: 0.7 }}>
+                <Button 
+                  variant="hero" 
+                  size="xl" 
+                  className="text-lg shadow-2xl hover:shadow-xl transition-all duration-300 ease-in-out hover:scale-105 animate-bounce"
+                  onClick={() => {
+                    toast.success("Redirecting to Sign Up!", {
+                      description: "Create your account and start your journey"
+                    });
+                    setTimeout(() => {
+                      window.location.href = "/signup";
+                    }, 1000);
+                  }}
+                >
+                  Get Started Today
+                  <ArrowRight className="w-5 h-5 ml-2 animate-spin" />
+                </Button>
+              </motion.div>
+              <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.6, delay: 0.9 }}>
+                <Button 
+                  variant="outline" 
+                  size="xl" 
+                  className="text-lg border-white/30 text-white hover:bg-white/10 backdrop-blur-sm transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl"
+                  onClick={handleDemoClick}
+                >
+                  <Play className="w-5 h-5 mr-2 animate-pulse" />
+                  Watch Demo
+                </Button>
+              </motion.div>
               {/* Removed duplicate sign in button from hero */}
             </div>
           ) : (
@@ -315,20 +400,196 @@ const Landing = () => {
           )}
         </div>
       </section>
+    </Fade>
+
+      {/* Problem Statement Section */}
+      <Slide direction="up" triggerOnce>
+        <section className="py-20 bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-4 py-2 rounded-full text-sm font-medium mb-4">
+                <AlertTriangle className="w-4 h-4" />
+                Current Campus Reality
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                The Placement Process is 
+                <span className="block text-red-600 dark:text-red-400">Broken</span>
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Every year, thousands of students struggle through a chaotic maze of disconnected systems
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+              {[
+                {
+                  icon: MessageCircle,
+                  title: "Scattered Communications",
+                  description: "Internship notices buried in WhatsApp groups, students miss critical deadlines",
+                  color: "text-red-500"
+                },
+                {
+                  icon: Mail,
+                  title: "Email Chaos",
+                  description: "Resumes lost in email chains, no tracking of application status",
+                  color: "text-orange-500"
+                },
+                {
+                  icon: Building,
+                  title: "Multiple Office Visits",
+                  description: "Students waste time chasing approvals across different departments",
+                  color: "text-yellow-500"
+                },
+                {
+                  icon: FileSpreadsheet,
+                  title: "Manual Spreadsheets",
+                  description: "Placement cells drowning in manual status updates instead of coaching",
+                  color: "text-blue-500"
+                },
+                {
+                  icon: Users,
+                  title: "Lost Mentors",
+                  description: "Faculty mentors lose track of who applied where and when",
+                  color: "text-purple-500"
+                },
+                {
+                  icon: TrendingDown,
+                  title: "Missed Opportunities",
+                  description: "Students unaware of suitable openings, companies can't find right talent",
+                  color: "text-green-500"
+                }
+              ].map((problem, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className="h-full p-6 hover:shadow-lg transition-all duration-300 border-l-4 border-l-red-200 dark:border-l-red-800">
+                    <problem.icon className={`w-12 h-12 ${problem.color} mb-4`} />
+                    <h3 className="text-xl font-semibold mb-3">{problem.title}</h3>
+                    <p className="text-muted-foreground">{problem.description}</p>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="text-center">
+              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-6 py-3 rounded-full text-lg font-semibold">
+                <ArrowDown className="w-5 h-5" />
+                But there's a better way...
+              </div>
+            </div>
+          </div>
+        </section>
+      </Slide>
 
       {/* Stats Section */}
-      <section className="py-16 bg-muted/30">
+      <Slide direction="up" triggerOnce>
+        <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
-              <div key={index} className="text-center">
+              <motion.div key={index} className="text-center" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.1 }}>
                 <div className="text-4xl md:text-5xl font-bold text-primary mb-2">{stat.number}</div>
-                <div className="text-muted-foreground font-medium">{stat.label}</div>
-              </div>
+                <div className="text-foreground font-semibold mb-1">{stat.label}</div>
+                <div className="text-sm text-muted-foreground">{stat.subtitle}</div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
+      </Slide>
+
+      {/* Solution Section */}
+      <Slide direction="up" triggerOnce>
+        <section className="py-20 bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 px-4 py-2 rounded-full text-sm font-medium mb-4">
+                <CheckCircle className="w-4 h-4" />
+                InternLink Solution
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                One Platform.
+                <span className="block text-green-600 dark:text-green-400">All Solutions.</span>
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Transform chaos into clarity with our intelligent, automated platform
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[
+                {
+                  icon: Target,
+                  title: "Single Source of Truth",
+                  description: "All internship & placement activities centralized in one intelligent platform",
+                  color: "text-blue-500",
+                  bgColor: "bg-blue-50 dark:bg-blue-950/20"
+                },
+                {
+                  icon: BrainCircuit,
+                  title: "AI-Powered Matching",
+                  description: "Smart recommendations match students with perfect opportunities automatically",
+                  color: "text-purple-500",
+                  bgColor: "bg-purple-50 dark:bg-purple-950/20"
+                },
+                {
+                  icon: CheckCircle,
+                  title: "One-Click Applications",
+                  description: "Students apply to multiple opportunities without repetitive form filling",
+                  color: "text-green-500",
+                  bgColor: "bg-green-50 dark:bg-green-950/20"
+                },
+                {
+                  icon: Calendar,
+                  title: "Automated Workflows",
+                  description: "Digital approvals, interview scheduling, and progress tracking",
+                  color: "text-orange-500",
+                  bgColor: "bg-orange-50 dark:bg-orange-950/20"
+                },
+                {
+                  icon: BarChart3,
+                  title: "Real-Time Analytics",
+                  description: "Live dashboards show placement status, interview schedules, and trends",
+                  color: "text-red-500",
+                  bgColor: "bg-red-50 dark:bg-red-950/20"
+                },
+                {
+                  icon: Award,
+                  title: "Automated Certificates",
+                  description: "Supervisor feedback triggers instant certificate generation and records",
+                  color: "text-yellow-500",
+                  bgColor: "bg-yellow-50 dark:bg-yellow-950/20"
+                }
+              ].map((solution, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className={`h-full p-6 hover:shadow-lg transition-all duration-300 border-l-4 border-l-green-200 dark:border-l-green-800 ${solution.bgColor}`}>
+                    <solution.icon className={`w-12 h-12 ${solution.color} mb-4`} />
+                    <h3 className="text-xl font-semibold mb-3">{solution.title}</h3>
+                    <p className="text-muted-foreground">{solution.description}</p>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="text-center mt-16">
+              <div className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-full text-lg font-semibold shadow-lg">
+                <Trophy className="w-5 h-5" />
+                Result: 70% faster placement process
+              </div>
+            </div>
+          </div>
+        </section>
+      </Slide>
 
       {/* Dynamic Content Based on User Status */}
       {user ? (
@@ -623,7 +884,9 @@ const Landing = () => {
       )}
 
       {/* Features Section */}
-      <section className="py-20 bg-muted/30">
+  <Fade triggerOnce>
+  <Fade triggerOnce>
+  <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">Powerful Features</h2>
@@ -633,7 +896,8 @@ const Landing = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <Card className="text-center bg-gradient-card border-0 shadow-card">
+            {/* Cards with scroll and hover animation */}
+            <Card className="text-center bg-gradient-card border-0 shadow-card transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl" data-aos="zoom-in" data-aos-delay="100">
               <CardHeader>
                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <BarChart3 className="w-8 h-8 text-primary" />
@@ -647,7 +911,7 @@ const Landing = () => {
               </CardContent>
             </Card>
 
-            <Card className="text-center bg-gradient-card border-0 shadow-card">
+            <Card className="text-center bg-gradient-card border-0 shadow-card transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl" data-aos="zoom-in" data-aos-delay="200">
               <CardHeader>
                 <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <CheckCircle className="w-8 h-8 text-success" />
@@ -661,7 +925,7 @@ const Landing = () => {
               </CardContent>
             </Card>
 
-            <Card className="text-center bg-gradient-card border-0 shadow-card">
+            <Card className="text-center bg-gradient-card border-0 shadow-card transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl" data-aos="zoom-in" data-aos-delay="300">
               <CardHeader>
                 <div className="w-16 h-16 bg-warning/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Users className="w-8 h-8 text-warning" />
@@ -676,7 +940,8 @@ const Landing = () => {
             </Card>
           </div>
         </div>
-      </section>
+  </section>
+  </Fade>
 
       {/* Call to Action Section */}
       <section className="py-20 bg-gradient-to-br from-background via-muted/20 to-background relative overflow-hidden">
@@ -732,225 +997,49 @@ const Landing = () => {
             </div>
           </div>
         </div>
-      </section>
+  </section>
+  </Fade>
 
-      {/* Newsletter Section */}
-      <section className="py-16 bg-gradient-to-r from-primary to-primary-light">
-        <div className="container mx-auto px-4 text-center">
-          <div className="max-w-2xl mx-auto text-white">
-            <h3 className="text-3xl font-bold mb-4">Stay Updated</h3>
-            <p className="text-primary-foreground/90 mb-8 text-lg">
-              Get the latest updates on new features, opportunities, and success stories
-            </p>
-            <div className="max-w-md mx-auto">
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex-1 relative">
-                  <label htmlFor="newsletter-email" className="sr-only">
-                    Email address for newsletter subscription
-                  </label>
-                  <input 
-                    id="newsletter-email"
-                    type="email" 
-                    placeholder="Enter your email address"
-                    required
-                    aria-label="Email address for newsletter subscription"
-                    className="w-full px-5 py-4 rounded-xl border-2 border-white/20 bg-white/95 backdrop-blur-sm text-gray-900 placeholder-gray-500 font-medium text-base shadow-lg focus:ring-4 focus:ring-white/30 focus:border-white focus:outline-none focus:bg-white transition-all duration-300 hover:border-white/40 hover:bg-white"
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        handleNewsletterSignup((e.target as HTMLInputElement).value);
-                      }
-                    }}
-                    onChange={(e) => {
-                      // Add visual feedback for valid email
-                      const email = e.target.value;
-                      const isValid = email.includes('@') && email.includes('.');
-                      e.target.style.borderColor = email.length > 0 ? (isValid ? '#22c55e' : '#ef4444') : '';
-                    }}
-                  />
-                  <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                    <Mail className="w-5 h-5 text-gray-400" />
-                  </div>
-                </div>
-                <Button 
-                  variant="secondary" 
-                  size="lg" 
-                  onClick={() => {
-                    const input = document.getElementById('newsletter-email') as HTMLInputElement;
-                    handleNewsletterSignup(input?.value || '');
-                  }}
-                  className="whitespace-nowrap px-6 py-4 bg-white text-primary font-semibold rounded-xl hover:bg-gray-50 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl border-2 border-white/20"
-                >
-                  Subscribe Now
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
-              </div>
-              
-              {/* Additional visual feedback */}
-              <div className="mt-3 flex items-center justify-center gap-2 text-white/80 text-sm">
-                <Shield className="w-4 h-4" />
-                <span>We respect your privacy. Unsubscribe anytime.</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Newsletter Section removed to avoid duplication. Only footer version remains. */}
 
-      {/* Comprehensive Footer */}
+      {/* Minimal Footer */}
       <footer className="bg-background border-t">
-        <div className="container mx-auto px-4 py-16">
-          {/* Main Footer Content */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            {/* Brand Section */}
-            <div className="space-y-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center">
-                  <GraduationCap className="w-6 h-6 text-primary-foreground" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold">InternLink</h3>
-                  <p className="text-sm text-muted-foreground">Placement Management</p>
-                </div>
+        <div className="container mx-auto px-4 py-4">
+            {/* Brand and Essential Links Only */}
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-light rounded-lg flex items-center justify-center">
+                <GraduationCap className="w-5 h-5 text-primary-foreground" />
               </div>
-              <p className="text-muted-foreground leading-relaxed">
-                Empowering careers through innovative technology solutions. Connecting students, mentors, and recruiters in one unified platform.
-              </p>
-              <div className="flex gap-4">
-                {[
-                  { icon: Facebook, name: 'Facebook' },
-                  { icon: Twitter, name: 'Twitter' },
-                  { icon: Linkedin, name: 'LinkedIn' },
-                  { icon: Instagram, name: 'Instagram' },
-                  { icon: Youtube, name: 'YouTube' }
-                ].map((social) => (
-                  <Button
-                    key={social.name}
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleSocialClick(social.name)}
-                    className="hover:bg-primary hover:text-primary-foreground transition-colors"
-                  >
-                    <social.icon className="w-5 h-5" />
-                  </Button>
-                ))}
+              <div>
+                <h3 className="text-lg font-bold">InternLink</h3>
+                <p className="text-xs text-muted-foreground">Placement Management</p>
               </div>
             </div>
 
-            {/* Quick Links */}
-            <div className="space-y-6">
-              <h4 className="text-lg font-semibold">Quick Links</h4>
-              <div className="space-y-3">
-                {[
-                  { name: 'About Us', action: () => handlePublicFeature('About Us') },
-                  { name: 'How It Works', action: () => handlePublicFeature('How It Works') },
-                  { name: 'Success Stories', action: () => handlePublicFeature('Success Stories') },
-                  { name: 'Pricing', action: () => handlePublicFeature('Pricing') },
-                  { name: 'FAQ', action: () => handlePublicFeature('FAQ') },
-                  { name: 'Blog', action: () => handlePublicFeature('Blog') }
-                ].map((link) => (
-                  <button
-                    key={link.name}
-                    onClick={link.action}
-                    className="block text-muted-foreground hover:text-primary transition-colors text-left"
-                  >
-                    {link.name}
-                  </button>
-                ))}
-              </div>
+            {/* Essential Links */}
+            <div className="flex items-center gap-6 text-sm">
+              <Link to="/about" className="text-muted-foreground hover:text-primary transition-colors">
+                About
+              </Link>
+              <Link to="/contact" className="text-muted-foreground hover:text-primary transition-colors">
+                Support
+              </Link>
+              <button 
+                onClick={() => handlePublicFeature('Help Center')}
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                Help
+              </button>
             </div>
 
-            {/* Support */}
-            <div className="space-y-6">
-              <h4 className="text-lg font-semibold">Support</h4>
-              <div className="space-y-3">
-                {[
-                  { name: 'Help Center', action: () => handlePublicFeature('Help Center') },
-                  { name: 'Contact Support', action: handleContactSupport },
-                  { name: 'Documentation', action: () => handlePublicFeature('Documentation') },
-                  { name: 'System Status', action: () => handlePublicFeature('System Status') },
-                  { name: 'Report Issue', action: () => handlePublicFeature('Report Issue') },
-                  { name: 'Feature Request', action: () => handlePublicFeature('Feature Request') }
-                ].map((link) => (
-                  <button
-                    key={link.name}
-                    onClick={link.action}
-                    className="block text-muted-foreground hover:text-primary transition-colors text-left"
-                  >
-                    {link.name}
-                  </button>
-                ))}
+            {/* Copyright & Status */}
+            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+              <span>© 2025 InternLink</span>
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-green-600">Online</span>
               </div>
             </div>
-
-            {/* Contact Info */}
-            <div className="space-y-6">
-              <h4 className="text-lg font-semibold">Get In Touch</h4>
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-primary mt-0.5" />
-                  <div>
-                    <p className="font-medium">Office Address</p>
-                    <p className="text-sm text-muted-foreground">123 University Ave<br />Academic City, AC 12345</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Phone className="w-5 h-5 text-primary mt-0.5" />
-                  <div>
-                    <p className="font-medium">Phone Support</p>
-                    <button 
-                      onClick={handleContactSupport}
-                      className="text-sm text-primary hover:underline"
-                    >
-                      +1 (555) 123-4567
-                    </button>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Mail className="w-5 h-5 text-primary mt-0.5" />
-                  <div>
-                    <p className="font-medium">Email Support</p>
-                    <button 
-                      onClick={handleContactSupport}
-                      className="text-sm text-primary hover:underline"
-                    >
-                      support@internlink.edu
-                    </button>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Clock className="w-5 h-5 text-primary mt-0.5" />
-                  <div>
-                    <p className="font-medium">Support Hours</p>
-                    <p className="text-sm text-muted-foreground">Mon-Fri: 9AM-6PM<br />Weekend: 10AM-4PM</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Footer Bottom */}
-          <div className="border-t pt-8">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
-                <span>© 2025 InternLink. All rights reserved.</span>
-                <button onClick={() => handlePublicFeature('Privacy Policy')} className="hover:text-primary transition-colors">
-                  Privacy Policy
-                </button>
-                <button onClick={() => handlePublicFeature('Terms of Service')} className="hover:text-primary transition-colors">
-                  Terms of Service
-                </button>
-                <button onClick={() => handlePublicFeature('Cookie Policy')} className="hover:text-primary transition-colors">
-                  Cookie Policy
-                </button>
-              </div>
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <span>Made with ❤️ for education</span>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
-                  <span>All systems operational</span>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </footer>
     </div>

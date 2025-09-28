@@ -6,9 +6,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { DevelopmentNotice } from "@/components/DevelopmentNotice";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
 import SimpleStudentDashboard from "./pages/SimpleStudentDashboard";
 import WorkingStudentDashboard from "./pages/WorkingStudentDashboardFixed";
 import AdminDashboard from "./pages/AdminDashboardFinal";
@@ -24,6 +27,7 @@ const App = () => (
     <ThemeProvider defaultTheme="dark" storageKey="InternLink-ui-theme">
       <AuthProvider>
         <TooltipProvider>
+          <DevelopmentNotice />
           <Toaster />
           <Sonner />
           <BrowserRouter>
@@ -31,6 +35,8 @@ const App = () => (
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
           <Route 
             path="/student" 
             element={

@@ -108,8 +108,8 @@ const SignUp = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center p-4">
-      <div className="absolute top-4 left-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center p-4 pt-16">
+      <div className="absolute top-16 left-4">
         <Button variant="ghost" asChild>
           <Link to="/">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -118,7 +118,7 @@ const SignUp = () => {
         </Button>
       </div>
 
-      <div className="absolute top-4 right-4">
+      <div className="absolute top-16 right-4">
         <ThemeSwitch />
       </div>
 
