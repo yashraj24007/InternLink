@@ -225,27 +225,13 @@ const Landing = () => {
                   </Link>
                 </Button>
                 
-                {/* Sign Out Button */}
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => {
-                    logout();
-                    toast.success("Signed out successfully");
-                    navigate('/');
-                  }}
-                >
-                  Sign Out
-                </Button>
+                {/* Only show dashboard button, remove sign out */}
               </div>
             ) : (
-              /* Show Sign In/Sign Up buttons for guests */
+              // Show only Login button for guests
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" asChild>
-                  <Link to="/login">Sign In</Link>
-                </Button>
-                <Button size="sm" asChild>
-                  <Link to="/signup">Sign Up</Link>
+                  <Link to="/login">Login</Link>
                 </Button>
               </div>
             )}
@@ -297,16 +283,7 @@ const Landing = () => {
                 <Play className="w-5 h-5 mr-2" />
                 Watch Demo
               </Button>
-              <Button 
-                variant="ghost" 
-                size="xl" 
-                className="text-lg text-white/80 hover:text-white hover:bg-white/5 transition-all duration-300"
-                asChild
-              >
-                <Link to="/login">
-                  Already have an account? Sign In
-                </Link>
-              </Button>
+              {/* Removed duplicate sign in button from hero */}
             </div>
           ) : (
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -637,11 +614,7 @@ const Landing = () => {
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Link>
                   </Button>
-                  <Button variant="outline" size="lg" asChild>
-                    <Link to="/login">
-                      Sign In
-                    </Link>
-                  </Button>
+                  {/* Removed duplicate sign in button from signup section */}
                 </div>
               </div>
             </div>
