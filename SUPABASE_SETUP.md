@@ -27,8 +27,7 @@
    npm run dev
    ```
 
-2. In development mode, you'll see a "Test DB" button in the header
-3. Click it to test your Supabase connection
+2. The application will automatically connect to your Supabase instance
 
 ## Authentication Flow
 

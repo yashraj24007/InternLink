@@ -41,7 +41,8 @@ import {
   ArrowDown,
   FileSpreadsheet,
   TrendingDown,
-  LogOut
+  LogOut,
+  Settings
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -59,7 +60,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
-import { testSupabaseConnection, initializeSupabaseSchema } from "@/lib/supabase-test";
+
 import campusHero from "@/assets/campus-hero.jpg";
 import placementSuccess from "@/assets/placement-success.jpg";
 import studentsWorking from "@/assets/students-working.jpg";
@@ -134,35 +135,6 @@ const Landing = () => {
     });
   };
 
-  const testSupabase = async () => {
-    toast.info("Testing Supabase connection...", {
-      description: "Checking database connectivity"
-    });
-    
-    try {
-      const connectionTest = await testSupabaseConnection();
-      const schemaTest = await initializeSupabaseSchema();
-      
-      if (connectionTest.success && schemaTest.success) {
-        toast.success("Supabase is working perfectly!", {
-          description: "Database connection and schema verified"
-        });
-      } else if (connectionTest.success && schemaTest.needsSetup) {
-        toast.warning("Supabase connected but needs schema setup", {
-          description: "Database tables need to be created"
-        });
-      } else {
-        toast.error("Supabase connection issues", {
-          description: connectionTest.error || schemaTest.error || "Unknown error"
-        });
-      }
-    } catch (error) {
-      toast.error("Supabase test failed", {
-        description: "Unable to connect to database"
-      });
-    }
-  };
-
   // Function to check if user can access a specific role dashboard
   const canAccessRole = (roleType: string) => {
     if (!user) return false;
@@ -181,12 +153,13 @@ const Landing = () => {
   // Get role-specific dashboard path and label
   const getRoleDashboard = (role: string) => {
     const dashboardConfig = {
-      'admin': { path: '/admin', label: 'Admin Dashboard' },
-      'student': { path: '/student', label: 'Student Dashboard' },
-      'mentor': { path: '/mentor', label: 'Mentor Dashboard' },
-      'recruiter': { path: '/recruiter', label: 'Recruiter Dashboard' },
-      'placement_cell': { path: '/placement', label: 'Placement Dashboard' }
-    };    return dashboardConfig[role as keyof typeof dashboardConfig] || { path: '/', label: 'Dashboard' };
+      'admin': { path: '/admin', label: 'Dashboard' },
+      'student': { path: '/student', label: 'Dashboard' },
+      'mentor': { path: '/mentor', label: 'Dashboard' },
+      'recruiter': { path: '/recruiter', label: 'Dashboard' },
+      'placement_cell': { path: '/placement', label: 'Dashboard' }
+    };
+    return dashboardConfig[role as keyof typeof dashboardConfig] || { path: '/', label: 'Dashboard' };
   };
 
   const roles = [
@@ -232,83 +205,142 @@ const Landing = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pt-[44px]">
       {/* Header */}
-      <header className="border-b bg-background/80 backdrop-blur-lg sticky top-12 z-40 shadow-md transition-all duration-300">
-  <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary-light rounded-lg flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-110">
-              <GraduationCap className="w-6 h-6 text-primary-foreground animate-pulse" />
+      <header className="border-b bg-background/95 backdrop-blur-lg sticky top-[44px] z-[100] shadow-lg transition-all duration-300 -mt-px">
+        <div className="container mx-auto px-4 py-2 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-primary via-primary-light to-primary/80 rounded-lg flex items-center justify-center shadow-md transition-transform duration-300 hover:scale-110">
+              <GraduationCap className="w-4 h-4 text-primary-foreground animate-pulse" />
             </div>
             <div>
-              <h1 className="text-xl font-extrabold text-foreground tracking-tight drop-shadow-sm transition-colors duration-300 hover:text-primary">InternLink</h1>
+              <h1 className="text-lg font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent tracking-tight transition-all duration-300 hover:scale-105">
+                InternLink
+              </h1>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {/* Supabase Test Button (Development Only) */}
-            {process.env.NODE_ENV === 'development' && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={testSupabase}
-                className="text-xs"
-              >
-                Test DB
-              </Button>
-            )}
             <ThemeSwitch />
             
             {user ? (
-              /* Show role-specific dashboard button for authenticated users */
+              /* Show role-specific dashboard button and user menu */
               <div className="flex items-center gap-3">
-                {/* User Profile Indicator */}
-                <div className="flex items-center gap-2 bg-muted/60 rounded-full px-3 py-1 shadow transition-all duration-300 hover:bg-muted/80 hover:shadow-lg">
-                  <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center animate-bounce">
-                    {user.role === 'admin' && <BarChart3 className="w-3 h-3 text-primary-foreground" />}
-                    {user.role === 'student' && <GraduationCap className="w-3 h-3 text-primary-foreground" />}
-                    {user.role === 'mentor' && <User className="w-3 h-3 text-primary-foreground" />}
-                    {user.role === 'recruiter' && <Users className="w-3 h-3 text-primary-foreground" />}
-                    {user.role === 'placement_cell' && <Briefcase className="w-3 h-3 text-primary-foreground" />}
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-xs text-muted-foreground">Welcome back</span>
-                    <span className="text-sm font-semibold capitalize text-foreground tracking-wide">{user.role}</span>
-                  </div>
-                </div>
                 {/* Role-specific Dashboard Button */}
-                <Button variant="default" size="sm" asChild className="transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg">
+                <Button variant="default" size="sm" asChild className="px-4 py-1.5 h-auto transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg">
                   <Link to={getRoleDashboard(user.role).path}>
                     {getRoleDashboard(user.role).label}
                   </Link>
                 </Button>
-                {/* Logout Button */}
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => {
-                    logout();
-                    toast.success("Logged out successfully!");
-                  }}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <LogOut className="w-4 h-4" />
-                </Button>
+                
+                {/* User Profile Dropdown */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      className="flex items-center gap-2 bg-muted/70 rounded-full px-3 py-1.5 shadow-md transition-all duration-300 hover:bg-muted/90 hover:shadow-lg border border-primary/20 h-auto"
+                    >
+                      <div className="w-6 h-6 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center shadow-sm">
+                        {user.role === 'admin' && <BarChart3 className="w-3 h-3 text-primary-foreground" />}
+                        {user.role === 'student' && <GraduationCap className="w-3 h-3 text-primary-foreground" />}
+                        {user.role === 'mentor' && <User className="w-3 h-3 text-primary-foreground" />}
+                        {user.role === 'recruiter' && <Users className="w-3 h-3 text-primary-foreground" />}
+                        {user.role === 'placement_cell' && <Briefcase className="w-3 h-3 text-primary-foreground" />}
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <div className="flex flex-col text-left">
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs text-muted-foreground">Welcome back</span>
+                            <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-sm font-medium text-foreground">{user.name || user.role}</span>
+                            <Badge variant="outline" className="text-xs capitalize px-1 py-0 bg-primary/10 text-primary border-primary/20">
+                              {user.role.replace('_', ' ')}
+                            </Badge>
+                          </div>
+                        </div>
+                        <ChevronRight className="w-3 h-3 text-muted-foreground" />
+                      </div>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{user.name || `${user.role} User`}</p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user.email || `${user.role}@internlink.demo`}
+                        </p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <Badge variant="secondary" className="text-xs capitalize px-2 py-0.5">
+                            {user.role.replace('_', ' ')}
+                          </Badge>
+                          <div className="flex items-center gap-1">
+                            <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                            <span className="text-xs text-green-600">Online</span>
+                          </div>
+                        </div>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate(getRoleDashboard(user.role).path)}>
+                      <div className="w-4 h-4 mr-2">
+                        {user.role === 'admin' && <BarChart3 className="w-4 h-4" />}
+                        {user.role === 'student' && <GraduationCap className="w-4 h-4" />}
+                        {user.role === 'mentor' && <User className="w-4 h-4" />}
+                        {user.role === 'recruiter' && <Users className="w-4 h-4" />}
+                        {user.role === 'placement_cell' && <Briefcase className="w-4 h-4" />}
+                      </div>
+                      Go to Dashboard
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => {
+                      const dashboardPath = getRoleDashboard(user.role).path;
+                      navigate(dashboardPath);
+                      toast.info("Opening Profile Settings", {
+                        description: "You can edit your profile in the dashboard"
+                      });
+                    }}>
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Profile Settings</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => {
+                      const dashboardPath = getRoleDashboard(user.role).path;
+                      navigate(dashboardPath);
+                      toast.info("Opening Account Settings", {
+                        description: "You can manage your account in the dashboard settings"
+                      });
+                    }}>
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Account Settings</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={() => {
+                        logout();
+                        toast.success("Logged out successfully!");
+                      }}
+                      className="text-red-600 focus:text-red-600"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             ) : (
               // Show only Login button for guests
               <div className="flex items-center gap-2">
-                <Button variant="default" size="sm" asChild className="transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg">
+                <Button variant="default" size="sm" asChild className="px-4 py-1.5 h-auto transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg">
                   <Link to="/login">Login</Link>
                 </Button>
               </div>
             )}
           </div>
         </div>
-  </header>
+      </header>
 
       {/* Hero Section */}
-  <Fade triggerOnce>
-  <section className="relative overflow-hidden bg-gradient-to-br from-blue-900 via-purple-900 to-slate-900 min-h-screen flex items-center">
+      <Fade triggerOnce>
+        <section className="relative overflow-hidden bg-gradient-to-br from-blue-900 via-purple-900 to-slate-900 min-h-screen flex items-center -mt-[60px]">
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-60"
           style={{ backgroundImage: `url(${campusHero})` }}
@@ -356,9 +388,9 @@ const Landing = () => {
               </motion.div>
               <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.6, delay: 0.9 }}>
                 <Button 
-                  variant="outline" 
+                  variant="secondary" 
                   size="xl" 
-                  className="text-lg border-white/30 text-white hover:bg-white/10 backdrop-blur-sm transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl"
+                  className="text-lg bg-white/20 border border-white/30 text-white hover:bg-white/30 backdrop-blur-md transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl shadow-2xl"
                   onClick={handleDemoClick}
                 >
                   <Play className="w-5 h-5 mr-2 animate-pulse" />
@@ -381,9 +413,9 @@ const Landing = () => {
                 </Link>
               </Button>
               <Button 
-                variant="outline" 
+                variant="secondary" 
                 size="xl" 
-                className="text-lg border-white/30 text-white hover:bg-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-105"
+                className="text-lg bg-white/20 border border-white/30 text-white hover:bg-white/30 backdrop-blur-md transition-all duration-300 hover:scale-105 shadow-2xl"
                 onClick={() => {
                   toast.info("Platform overview", {
                     description: "Explore all features available on InternLink"
@@ -999,44 +1031,60 @@ const Landing = () => {
 
       {/* Newsletter Section removed to avoid duplication. Only footer version remains. */}
 
-      {/* Minimal Footer */}
-      <footer className="bg-background border-t">
-        <div className="container mx-auto px-4 py-4">
-            {/* Brand and Essential Links Only */}
+      {/* Enhanced Footer */}
+      <footer className="bg-gradient-to-r from-background to-muted/30 border-t border-border/50 shadow-lg">
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+            {/* Brand Section */}
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-light rounded-lg flex items-center justify-center">
-                <GraduationCap className="w-5 h-5 text-primary-foreground" />
+              <div className="w-10 h-10 bg-gradient-to-br from-primary via-primary-light to-primary/80 rounded-xl flex items-center justify-center shadow-lg">
+                <GraduationCap className="w-6 h-6 text-primary-foreground" />
               </div>
               <div>
-                <h3 className="text-lg font-bold">InternLink</h3>
-                <p className="text-xs text-muted-foreground">Placement Management</p>
+                <h3 className="text-xl font-bold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
+                  InternLink
+                </h3>
+                <p className="text-sm text-muted-foreground">Smart Placement Management</p>
               </div>
             </div>
 
             {/* Essential Links */}
-            <div className="flex items-center gap-6 text-sm">
-              <Link to="/about" className="text-muted-foreground hover:text-primary transition-colors">
-                About
-              </Link>
-              <Link to="/contact" className="text-muted-foreground hover:text-primary transition-colors">
-                Support
-              </Link>
-              <button 
-                onClick={() => handlePublicFeature('Help Center')}
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
-                Help
-              </button>
-            </div>
-
-            {/* Copyright & Status */}
-            <div className="flex items-center gap-4 text-xs text-muted-foreground">
-              <span>© 2025 InternLink</span>
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-green-600">Online</span>
+            <div className="flex justify-center">
+              <div className="flex items-center gap-8 text-sm">
+                <Link 
+                  to="/about" 
+                  className="text-muted-foreground hover:text-primary transition-all duration-200 hover:scale-105 flex items-center gap-1"
+                >
+                  <span>About</span>
+                </Link>
+                <Link 
+                  to="/contact" 
+                  className="text-muted-foreground hover:text-primary transition-all duration-200 hover:scale-105 flex items-center gap-1"
+                >
+                  <span>Support</span>
+                </Link>
+                <button 
+                  onClick={() => handlePublicFeature('Help Center')}
+                  className="text-muted-foreground hover:text-primary transition-all duration-200 hover:scale-105 flex items-center gap-1"
+                >
+                  <span>Help</span>
+                </button>
               </div>
             </div>
+
+            {/* Status & Copyright */}
+            <div className="flex flex-col items-end gap-2">
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 bg-green-50 dark:bg-green-950/30 px-2 py-1 rounded-full border border-green-200 dark:border-green-800">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-xs text-green-600 dark:text-green-400 font-medium">System Online</span>
+                </div>
+              </div>
+              <div className="text-xs text-muted-foreground">
+                © 2025 InternLink. All rights reserved.
+              </div>
+            </div>
+          </div>
         </div>
       </footer>
     </div>

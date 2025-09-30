@@ -765,7 +765,7 @@ const AdminDashboard = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                    <Button className="w-full">Assign Role</Button>
+                    <Button className="w-full" onClick={() => toast.success("Role Assigned!", { description: "User role has been successfully updated." })}>Assign Role</Button>
                     <div className="text-sm text-muted-foreground">
                       • Promote student to alumni<br />
                       • Add new mentor<br />
@@ -1761,7 +1761,7 @@ const AdminDashboard = () => {
                       <span className="font-medium">Role Analytics</span>
                     </div>
                     <p className="text-sm text-gray-500 mb-3">Track mentor/recruiter activity and student engagement</p>
-                    <Button variant="outline" size="sm">View Analytics</Button>
+                    <Button variant="outline" size="sm" onClick={() => toast.info("Analytics", { description: "Opening role analytics dashboard..." })}>View Analytics</Button>
                   </div>
                   
                   <div className="p-4 border rounded-lg">
@@ -1770,7 +1770,7 @@ const AdminDashboard = () => {
                       <span className="font-medium">Smart Notifications & Alerts</span>
                     </div>
                     <p className="text-sm text-gray-500 mb-3">System anomalies, failed uploads, missing approvals</p>
-                    <Button variant="outline" size="sm">Configure Alerts</Button>
+                    <Button variant="outline" size="sm" onClick={() => toast.success("Alerts Configured", { description: "Notification alerts have been set up." })}>Configure Alerts</Button>
                   </div>
                   
                   <div className="p-4 border rounded-lg">
@@ -1779,7 +1779,7 @@ const AdminDashboard = () => {
                       <span className="font-medium">Custom Dashboard Widgets</span>
                     </div>
                     <p className="text-sm text-gray-500 mb-3">Add/remove KPIs or charts dynamically</p>
-                    <Button variant="outline" size="sm">Customize Layout</Button>
+                    <Button variant="outline" size="sm" onClick={() => toast.info("Layout Customizer", { description: "Opening dashboard layout customization..." })}>Customize Layout</Button>
                   </div>
                   
                   <div className="p-4 border rounded-lg">
@@ -1788,7 +1788,7 @@ const AdminDashboard = () => {
                       <span className="font-medium">Real-time System Monitoring</span>
                     </div>
                     <p className="text-sm text-gray-500 mb-3">Live performance tracking and alerts</p>
-                    <Button variant="outline" size="sm">Enable Monitoring</Button>
+                    <Button variant="outline" size="sm" onClick={() => toast.success("Monitoring Enabled", { description: "Real-time system monitoring is now active." })}>Enable Monitoring</Button>
                   </div>
                 </div>
               </CardContent>

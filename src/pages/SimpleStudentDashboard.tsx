@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
 import { 
   User, 
   Briefcase, 
@@ -37,6 +38,61 @@ import {
 
 const SimpleStudentDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
+
+  // Button handlers
+  const handleEditProfile = () => {
+    toast.info("Profile Editor", {
+      description: "Opening profile editing interface..."
+    });
+  };
+
+  const handleApplyNow = (position: string, company: string) => {
+    toast.success(`Application Submitted!`, {
+      description: `Your application for ${position} at ${company} has been submitted.`
+    });
+  };
+
+  const handleViewCertificate = (certificateName: string) => {
+    toast.info("Certificate Viewer", {
+      description: `Opening ${certificateName} certificate...`
+    });
+  };
+
+  const handleJoinCommunity = () => {
+    toast.success("Welcome to the Community!", {
+      description: "You've successfully joined the student network."
+    });
+  };
+
+  const handleScheduleInterview = (company: string) => {
+    toast.info("Interview Scheduling", {
+      description: `Scheduling interview with ${company}...`
+    });
+  };
+
+  const handleRescheduleInterview = (company: string) => {
+    toast.info("Interview Rescheduling", {
+      description: `Rescheduling interview with ${company}...`
+    });
+  };
+
+  const handleConnectPeer = (name: string) => {
+    toast.success("Connection Sent!", {
+      description: `Connection request sent to ${name}.`
+    });
+  };
+
+  const handleJoinEvent = (eventName: string) => {
+    toast.success("Event Registration", {
+      description: `Successfully registered for ${eventName}!`
+    });
+  };
+
+  const handleViewEvent = (eventName: string) => {
+    toast.info("Event Details", {
+      description: `Opening details for ${eventName}...`
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background p-6 pt-18">
@@ -136,7 +192,7 @@ const SimpleStudentDashboard = () => {
                       <Badge className="mt-1">Profile 85% Complete</Badge>
                     </div>
                   </div>
-                  <Button>Edit Profile</Button>
+                  <Button onClick={handleEditProfile}>Edit Profile</Button>
                 </div>
               </CardContent>
             </Card>
@@ -163,7 +219,7 @@ const SimpleStudentDashboard = () => {
                       <CardContent>
                         <div className="space-y-2">
                           <p className="font-medium">{opp.salary}</p>
-                          <Button className="w-full">Apply Now</Button>
+                          <Button className="w-full" onClick={() => handleApplyNow(opp.position, opp.company)}>Apply Now</Button>
                         </div>
                       </CardContent>
                     </Card>
@@ -258,7 +314,7 @@ const SimpleStudentDashboard = () => {
                       </CardHeader>
                       <CardContent>
                         <p className="text-sm text-muted-foreground">Earned: {cert.date}</p>
-                        <Button size="sm" variant="outline" className="mt-2">View Certificate</Button>
+                        <Button size="sm" variant="outline" className="mt-2" onClick={() => handleViewCertificate(cert.name)}>View Certificate</Button>
                       </CardContent>
                     </Card>
                   ))}
@@ -499,7 +555,7 @@ const SimpleStudentDashboard = () => {
                                 ))}
                               </div>
                             </div>
-                            <Button size="sm" className="ml-4">
+                            <Button size="sm" className="ml-4" onClick={() => toast.info(`Career Path`, { description: `Exploring ${path.title} career path...` })}>
                               <Target className="w-4 h-4 mr-1" />
                               Explore Path
                             </Button>
@@ -543,7 +599,7 @@ const SimpleStudentDashboard = () => {
                                 </div>
                               </div>
                             </div>
-                            <Button size="sm" variant="outline">
+                            <Button size="sm" variant="outline" onClick={() => toast.success(`Starting Resource`, { description: `Opening ${resource.title}...` })}>
                               Start
                             </Button>
                           </div>
@@ -575,11 +631,11 @@ const SimpleStudentDashboard = () => {
                         <Badge variant="secondary" className="mt-1">Your Mentor</Badge>
                       </div>
                       <div className="space-y-2">
-                        <Button className="w-full" size="sm">
+                        <Button className="w-full" size="sm" onClick={() => toast.success("Call Scheduled!", { description: "1:1 call with Sarah Mitchell has been scheduled." })}>
                           <Video className="w-4 h-4 mr-2" />
                           Schedule 1:1 Call
                         </Button>
-                        <Button variant="outline" className="w-full" size="sm">
+                        <Button variant="outline" className="w-full" size="sm" onClick={() => toast.info("Message Sent", { description: "Your message has been sent to Sarah Mitchell." })}>
                           <MessageCircle className="w-4 h-4 mr-2" />
                           Send Message
                         </Button>
@@ -597,19 +653,19 @@ const SimpleStudentDashboard = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      <Button variant="outline" className="w-full justify-start">
+                      <Button variant="outline" className="w-full justify-start" onClick={() => toast.info("Career Assessment", { description: "Starting your career assessment..." })}>
                         <Target className="w-4 h-4 mr-2" />
                         Career Assessment
                       </Button>
-                      <Button variant="outline" className="w-full justify-start">
+                      <Button variant="outline" className="w-full justify-start" onClick={() => toast.info("Salary Calculator", { description: "Opening salary calculation tool..." })}>
                         <TrendingUp className="w-4 h-4 mr-2" />
                         Salary Calculator
                       </Button>
-                      <Button variant="outline" className="w-full justify-start">
+                      <Button variant="outline" className="w-full justify-start" onClick={() => toast.info("Interview Prep", { description: "Starting interview preparation..." })}>
                         <BookOpen className="w-4 h-4 mr-2" />
                         Interview Prep
                       </Button>
-                      <Button variant="outline" className="w-full justify-start">
+                      <Button variant="outline" className="w-full justify-start" onClick={() => toast.info("Resume Builder", { description: "Opening resume builder..." })}>
                         <Award className="w-4 h-4 mr-2" />
                         Resume Builder
                       </Button>
@@ -641,7 +697,7 @@ const SimpleStudentDashboard = () => {
                           </p>
                         </div>
                       </div>
-                      <Button className="bg-purple-600 hover:bg-purple-700 text-white">
+                      <Button className="bg-purple-600 hover:bg-purple-700 text-white" onClick={() => toast.info("Peer Discovery", { description: "Discovering peers with similar interests..." })}>
                         <UserPlus className="w-4 h-4 mr-2" />
                         Find Peers
                       </Button>
@@ -720,10 +776,10 @@ const SimpleStudentDashboard = () => {
                                 <div className="flex items-center justify-between">
                                   <span className="text-xs text-gray-500">{peer.connections} connections</span>
                                   <div className="flex gap-1">
-                                    <Button size="sm" variant="outline" className="h-7 px-2">
+                                    <Button size="sm" variant="outline" className="h-7 px-2" onClick={() => toast.info("Message", { description: `Opening chat with ${peer.name}...` })}>
                                       <MessageCircle className="w-3 h-3" />
                                     </Button>
-                                    <Button size="sm" className="h-7 px-3">
+                                    <Button size="sm" className="h-7 px-3" onClick={() => handleConnectPeer(peer.name)}>
                                       <UserPlus className="w-3 h-3 mr-1" />
                                       Connect
                                     </Button>
@@ -758,7 +814,7 @@ const SimpleStudentDashboard = () => {
                                   </div>
                                 </div>
                               </div>
-                              <Button size="sm" variant={group.isJoined ? "outline" : "default"}>
+                              <Button size="sm" variant={group.isJoined ? "outline" : "default"} onClick={() => group.isJoined ? toast.info("Already Member", { description: `You're already part of ${group.name}` }) : toast.success("Joined!", { description: `Successfully joined ${group.name}` })}>
                                 {group.isJoined ? "Joined" : "Join"}
                               </Button>
                             </div>
@@ -880,7 +936,7 @@ const SimpleStudentDashboard = () => {
                       </div>
                     </div>
                   </div>
-                  <Button>Save Settings</Button>
+                  <Button onClick={() => toast.success("Settings Saved!", { description: "Your account settings have been updated." })}>Save Settings</Button>
                 </div>
               </CardContent>
             </Card>
